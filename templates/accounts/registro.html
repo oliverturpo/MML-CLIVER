@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar mi Perfil{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 pt-20 py-8">
+<div class="container mx-auto px-4 flex justify-center fade-in">
+    <div class="w-full max-w-2xl">
+        <div class="card-glass rounded-3xl shadow-2xl overflow-hidden">
+
+            <!-- Card Header -->
+            <div class="text-center p-8 text-white bg-gradient-main">
+                <div class="mb-4">
+                    <i class="fas fa-user-plus text-5xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Registrar mi Perfil</h3>
+                <p class="opacity-90">Crea tu espacio personal para tu proyecto ML</p>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-6 md:p-8">
+                
+                <!-- Info Alert -->
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-start">
+                    <i class="fas fa-info-circle text-blue-500 mr-3 mt-1"></i>
+                    <div class="text-blue-800">
+                        <strong>Importante:</strong> Una vez registrado, tu perfil aparecerá en la galería pública. Para acceder a tu proyecto necesitarás tu PIN de 4 dígitos.
+                    </div>
+                </div>
+
+                <!-- Registration Form -->
+                <form method="POST" id="registroForm" class="space-y-6">
+                    {% csrf_token %}
+
+                    <!-- Full Name -->
+                    <div>
+                        <label for="nombre_completo" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-user text-primary mr-2"></i>
+                            Nombre Completo
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                            id="nombre_completo"
+                            name="nombre_completo"
+                            required
+                            placeholder="Ingresa tu nombre completo"
+                        >
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-envelope text-primary mr-2"></i>
+                            Correo Electrónico
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <input
+                                type="email"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                                id="email"
+                                name="email"
+                                required
+                                placeholder="ejemplo@correo.com"
+                            >
+                            <span class="absolute top-1/2 right-3 transform -translate-y-1/2 text-green-500 hidden" id="emailCheck">
+                                <i class="fas fa-check-circle"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Career -->
+                    <div>
+                        <label for="carrera" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-graduation-cap text-primary mr-2"></i>
+                            Carrera
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                            id="carrera"
+                            name="carrera"
+                            required
+                            value="Ingeniería Estadística e Informática"
+                        >
+                    </div>
+
+                    <!-- Access Code -->
+                    <div>
+                        <label for="codigo_acceso" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-key text-primary mr-2"></i>
+                            Código de Acceso
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                            id="codigo_acceso"
+                            name="codigo_acceso"
+                            required
+                            placeholder="Ingresa el código proporcionado"
+                        >
+                        <div class="flex justify-between items-center mt-2">
+                            <small class="text-gray-500">Solicita el código a tu compañero de clase</small>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                Requerido
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- PIN -->
+                    <div>
+                        <label for="pin" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-lock text-primary mr-2"></i>
+                            Crear PIN de 4 dígitos
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <input
+                                type="password"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                                id="pin"
+                                name="pin"
+                                required
+                                pattern="[0-9]{4}"
+                                maxlength="4"
+                                placeholder="Ej: 1234"
+                            >
+                            <button
+                                type="button"
+                                class="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                id="togglePin"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+
+                        <!-- PIN Indicator -->
+                        <div class="flex items-center mt-3">
+                            <div class="flex gap-2 mr-4">
+                                <div class="w-3 h-3 rounded-full bg-gray-300" id="pinDot1"></div>
+                                <div class="w-3 h-3 rounded-full bg-gray-300" id="pinDot2"></div>
+                                <div class="w-3 h-3 rounded-full bg-gray-300" id="pinDot3"></div>
+                                <div class="w-3 h-3 rounded-full bg-gray-300" id="pinDot4"></div>
+                            </div>
+                            <small class="text-gray-500">Este PIN protegerá tu proyecto. Recuérdalo bien.</small>
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="space-y-4 pt-4">
+                        <button type="submit" class="w-full bg-gradient-main text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:shadow-custom hover:-translate-y-0.5">
+                            <i class="fas fa-check mr-2"></i>
+                            Registrarme
+                        </button>
+                        <a href="{% url 'landing_page' %}" class="block w-full text-center border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-xl font-medium transition-all duration-300 hover:bg-gray-50 hover:-translate-y-0.5">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Volver al Inicio
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Focus primer campo
+    document.getElementById('nombre_completo').focus();
+
+    // PIN validation y indicador visual
+    const pinInput = document.getElementById('pin');
+    const pinDots = [
+        document.getElementById('pinDot1'),
+        document.getElementById('pinDot2'),
+        document.getElementById('pinDot3'),
+        document.getElementById('pinDot4')
+    ];
+
+    pinInput.addEventListener('input', function(e) {
+        // Solo números
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+
+        const length = e.target.value.length;
+
+        // Actualizar indicadores
+        pinDots.forEach((dot, index) => {
+            if (index < length) {
+                dot.classList.remove('bg-gray-300');
+                dot.classList.add('bg-green-500');
+            } else {
+                dot.classList.remove('bg-green-500');
+                dot.classList.add('bg-gray-300');
+            }
+        });
+    });
+
+    // Toggle PIN visibility
+    document.getElementById('togglePin').addEventListener('click', function() {
+        const pinInput = document.getElementById('pin');
+        const icon = this.querySelector('i');
+
+        if (pinInput.type === 'password') {
+            pinInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            pinInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+
+    // Email validation
+    const emailInput = document.getElementById('email');
+    const emailCheck = document.getElementById('emailCheck');
+
+    emailInput.addEventListener('input', function(e) {
+        const email = e.target.value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (emailRegex.test(email)) {
+            emailCheck.classList.remove('hidden');
+            e.target.classList.add('ring-2', 'ring-green-500', 'border-green-500');
+        } else {
+            emailCheck.classList.add('hidden');
+            e.target.classList.remove('ring-2', 'ring-green-500', 'border-green-500');
+        }
+    });
+});
+</script>
+{% endblock %}

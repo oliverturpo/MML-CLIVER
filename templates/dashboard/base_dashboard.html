@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ perfil.nombre_completo }} - ML Dashboard{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    },
+                    colors: {
+                        primary: '#667eea',
+                        secondary: '#764ba2',
+                    },
+                    backgroundImage: {
+                        'gradient-main': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        'gradient-success': 'linear-gradient(135deg, #48bb78, #38a169)',
+                        'gradient-error': 'linear-gradient(135deg, #f56565, #e53e3e)',
+                        'gradient-warning': 'linear-gradient(135deg, #ed8936, #dd6b20)',
+                        'gradient-info': 'linear-gradient(135deg, #4299e1, #3182ce)',
+                    },
+                    animation: {
+                        'slide-in': 'slideIn 0.3s ease-out',
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'bounce-slow': 'bounce 2s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #5a6fd8, #6a4190); }
+
+        body { font-family: 'Inter', sans-serif; }
+
+        .sidebar-item {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-item:hover {
+            transform: translateX(4px);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+
+        .sidebar-item.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateX(8px);
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 font-inter">
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed left-0 top-0 h-full w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300">
+        <!-- Header del Sidebar -->
+        <div class="bg-gradient-main text-white p-6">
+            <div class="flex items-center mb-4">
+                {% if perfil.avatar %}
+                    <img src="{{ perfil.avatar.url }}" alt="{{ perfil.nombre_completo }}"
+                         class="w-12 h-12 rounded-full border-2 border-white/30 object-cover">
+                {% else %}
+                    <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-bold">
+                        {{ perfil.nombre_completo|first|upper }}
+                    </div>
+                {% endif %}
+                <div class="ml-3">
+                    <h3 class="font-semibold text-lg">{{ perfil.nombre_completo|title }}</h3>
+                    <p class="text-white/80 text-sm">{{ perfil.get_algoritmo_elegido_display|default:"ML Student" }}</p>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="bg-white/20 rounded-full h-2 mb-2">
+                <div class="bg-white rounded-full h-2 transition-all duration-500" style="width: {{ progreso|default:25 }}%"></div>
+            </div>
+            <p class="text-white/80 text-xs">Progreso del Proyecto: {{ progreso|default:25 }}%</p>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="{% url 'dashboard_inicio' perfil.id %}"
+                       class="sidebar-item flex items-center p-3 rounded-lg text-gray-700 {% if request.resolver_match.url_name == 'dashboard_inicio' %}active{% endif %}">
+                        <i class="fas fa-home mr-3 text-lg"></i>
+                        <span class="font-medium">Inicio</span>
+                        <div class="ml-auto w-2 h-2 bg-green-400 rounded-full"></div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'dashboard_datos' perfil.id %}"
+                       class="sidebar-item flex items-center p-3 rounded-lg text-gray-700 {% if request.resolver_match.url_name == 'dashboard_datos' %}active{% endif %}">
+                        <i class="fas fa-database mr-3 text-lg"></i>
+                        <span class="font-medium">Datos</span>
+                        {% if perfil.dataset_nombre %}
+                            <div class="ml-auto w-2 h-2 bg-green-400 rounded-full"></div>
+                        {% else %}
+                            <div class="ml-auto w-2 h-2 bg-gray-300 rounded-full"></div>
+                        {% endif %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'dashboard_modelo' perfil.id %}"
+                       class="sidebar-item flex items-center p-3 rounded-lg text-gray-700 {% if request.resolver_match.url_name == 'dashboard_modelo' %}active{% endif %}">
+                        <i class="fas fa-robot mr-3 text-lg"></i>
+                        <span class="font-medium">Modelo</span>
+                        {% if perfil.algoritmo_elegido %}
+                            <div class="ml-auto w-2 h-2 bg-green-400 rounded-full"></div>
+                        {% else %}
+                            <div class="ml-auto w-2 h-2 bg-gray-300 rounded-full"></div>
+                        {% endif %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'dashboard_resultados' perfil.id %}"
+                       class="sidebar-item flex items-center p-3 rounded-lg text-gray-700 {% if request.resolver_match.url_name == 'dashboard_resultados' %}active{% endif %}">
+                        <i class="fas fa-chart-line mr-3 text-lg"></i>
+                        <span class="font-medium">Resultados</span>
+                        {% if perfil.tiene_modelo_entrenado %}
+                            <div class="ml-auto w-2 h-2 bg-green-400 rounded-full"></div>
+                        {% else %}
+                            <div class="ml-auto w-2 h-2 bg-gray-300 rounded-full"></div>
+                        {% endif %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'dashboard_config' perfil.id %}"
+                       class="sidebar-item flex items-center p-3 rounded-lg text-gray-700 {% if request.resolver_match.url_name == 'dashboard_config' %}active{% endif %}">
+                        <i class="fas fa-cog mr-3 text-lg"></i>
+                        <span class="font-medium">Configuración</span>
+                        <div class="ml-auto w-2 h-2 bg-blue-400 rounded-full"></div>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Separador -->
+            <hr class="my-6 border-gray-200">
+
+            <!-- Enlaces Adicionales -->
+            <ul class="space-y-2">
+                <li>
+                    <a href="{% url 'landing_page' %}"
+                       class="sidebar-item flex items-center p-3 rounded-lg text-gray-700">
+                        <i class="fas fa-external-link-alt mr-3 text-lg"></i>
+                        <span class="font-medium">Galería Pública</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="logout()"
+                       class="sidebar-item flex items-center p-3 rounded-lg text-red-600 hover:bg-red-50">
+                        <i class="fas fa-sign-out-alt mr-3 text-lg"></i>
+                        <span class="font-medium">Cerrar Sesión</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="fixed top-4 left-4 z-50 lg:hidden bg-white p-3 rounded-lg shadow-lg">
+        <i class="fas fa-bars text-gray-700"></i>
+    </button>
+
+    <!-- Main Content -->
+    <div class="ml-0 lg:ml-72 min-h-screen">
+        <!-- Top Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200 p-4 lg:p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl lg:text-3xl font-bold text-gray-800">
+                        {% block page_title %}Dashboard{% endblock %}
+                    </h1>
+                    <p class="text-gray-600 mt-1">
+                        {% block page_subtitle %}Bienvenido a tu espacio de trabajo{% endblock %}
+                    </p>
+                </div>
+
+                <!-- Header Actions -->
+                <div class="flex items-center space-x-4">
+                    <div class="hidden md:flex items-center space-x-2 bg-gray-100 px-4 py-2 rounded-lg">
+                        <i class="fas fa-clock text-gray-500"></i>
+                        <span class="text-sm text-gray-600" id="current-time"></span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="p-4 lg:p-6">
+            <!-- Messages -->
+            {% if messages %}
+                <div class="mb-6">
+                    {% for message in messages %}
+                        <div class="mb-4 p-4 rounded-lg text-white font-medium animate-fade-in flex items-center justify-between
+                            {% if message.tags == 'success' %}bg-gradient-success
+                            {% elif message.tags == 'error' %}bg-gradient-error
+                            {% elif message.tags == 'warning' %}bg-gradient-warning
+                            {% elif message.tags == 'info' %}bg-gradient-info
+                            {% else %}bg-gradient-info{% endif %}">
+                            <div class="flex items-center">
+                                {% if message.tags == 'success' %}
+                                    <i class="fas fa-check-circle mr-3"></i>
+                                {% elif message.tags == 'error' %}
+                                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                                {% elif message.tags == 'warning' %}
+                                    <i class="fas fa-exclamation-circle mr-3"></i>
+                                {% elif message.tags == 'info' %}
+                                    <i class="fas fa-info-circle mr-3"></i>
+                                {% endif %}
+                                {{ message }}
+                            </div>
+                            <button type="button" class="text-white hover:text-gray-200 transition-colors" onclick="this.parentElement.remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Page Content -->
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+
+            mobileMenuBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+
+            // Clock
+            function updateTime() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                const clockElement = document.getElementById('current-time');
+                if (clockElement) {
+                    clockElement.textContent = timeString;
+                }
+            }
+            updateTime();
+            setInterval(updateTime, 1000);
+
+            // Auto-dismiss messages
+            setTimeout(() => {
+                document.querySelectorAll('[role="alert"]').forEach(alert => {
+                    if (alert && alert.parentNode) {
+                        alert.remove();
+                    }
+                });
+            }, 5000);
+
+            // Smooth animations
+            document.querySelectorAll('.animate-fade-in').forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+
+        // Logout function
+        function logout() {
+            if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
+                window.location.href = '{% url "landing_page" %}';
+            }
+        }
+
+        // Auto-save functionality
+        let autoSaveTimer;
+        function triggerAutoSave() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                console.log('Auto-saving...');
+                // Implement auto-save logic here
+            }, 2000);
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

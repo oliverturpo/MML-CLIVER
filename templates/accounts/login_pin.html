@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { font-family: 'Inter', sans-serif; }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .pin-input {
+            transition: all 0.3s ease;
+        }
+        .pin-input:focus {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3);
+        }
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-ring {
+            animation: pulse-ring 1.5s infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center p-4 relative overflow-hidden">
+    
+    <!-- Background decorative elements -->
+    <div class="absolute top-1/4 left-0 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl transform -translate-x-1/2"></div>
+    <div class="absolute bottom-1/4 right-0 w-80 h-80 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2"></div>
+    <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-white opacity-5 rounded-full blur-2xl transform -translate-x-1/2 -translate-y-1/2"></div>
+
+    <!-- Main PIN Authentication Card -->
+    <div id="pin-auth-card" class="glass-effect rounded-3xl shadow-2xl w-full max-w-lg p-8 fade-in">
+        
+        <!-- Header Section -->
+        <div id="card-header" class="text-center mb-8">
+            <!-- Lock Icon with Pulse Ring -->
+            <div class="relative inline-block mb-6">
+                <div class="absolute inset-0 rounded-full bg-white opacity-30 pulse-ring"></div>
+                <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center relative">
+                    <i class="fa-solid fa-lock text-3xl text-white"></i>
+                </div>
+            </div>
+            
+            <!-- Student Info -->
+            <div class="mb-4">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3">
+                    {{ perfil.nombre_completo|first|upper }}
+                </div>
+                <h1 class="text-2xl font-semibold text-white mb-2">
+                    Acceso al Proyecto de
+                </h1>
+                <h2 class="text-xl text-white font-medium">
+                    {{ perfil.nombre_completo }}
+                </h2>
+            </div>
+
+            <!-- Algorithm Badge -->
+            {% if perfil.get_algoritmo_elegido_display %}
+            <div class="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 rounded-full text-white text-sm">
+                <i class="fa-solid fa-code mr-2"></i>
+                {{ perfil.get_algoritmo_elegido_display }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- PIN Input Form -->
+        <form id="pin-form" method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- PIN Input Fields -->
+            <div id="pin-inputs" class="flex justify-center space-x-4 mb-8">
+                <input type="password" id="pin-1" name="pin-1" class="pin-input w-20 h-20 text-center text-2xl font-bold bg-white bg-opacity-20 border-2 border-white border-opacity-30 rounded-full text-white placeholder-gray-300 focus:outline-none focus:border-white focus:bg-opacity-30" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="PIN digit 1" autocomplete="off">
+                
+                <input type="password" id="pin-2" name="pin-2" class="pin-input w-20 h-20 text-center text-2xl font-bold bg-white bg-opacity-20 border-2 border-white border-opacity-30 rounded-full text-white placeholder-gray-300 focus:outline-none focus:border-white focus:bg-opacity-30" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="PIN digit 2" autocomplete="off">
+                
+                <input type="password" id="pin-3" name="pin-3" class="pin-input w-20 h-20 text-center text-2xl font-bold bg-white bg-opacity-20 border-2 border-white border-opacity-30 rounded-full text-white placeholder-gray-300 focus:outline-none focus:border-white focus:bg-opacity-30" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="PIN digit 3" autocomplete="off">
+                
+                <input type="password" id="pin-4" name="pin-4" class="pin-input w-20 h-20 text-center text-2xl font-bold bg-white bg-opacity-20 border-2 border-white border-opacity-30 rounded-full text-white placeholder-gray-300 focus:outline-none focus:border-white focus:bg-opacity-30" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="PIN digit 4" autocomplete="off">
+            </div>
+
+            <!-- Hidden combined PIN field -->
+            <input type="hidden" id="pin" name="pin" value="">
+
+            <!-- Show PIN Option -->
+            <div class="flex items-center justify-center mb-6">
+                <label class="flex items-center text-white text-sm cursor-pointer">
+                    <input type="checkbox" id="show-pin" class="mr-2 rounded">
+                    <span>Mostrar PIN</span>
+                </label>
+            </div>
+
+            <!-- Error Messages -->
+            {% if messages %}
+                <div id="error-messages" class="mb-6">
+                    {% for message in messages %}
+                        <div class="bg-red-500 bg-opacity-20 border border-red-400 text-white px-4 py-3 rounded-lg text-center shake">
+                            <i class="fa-solid fa-exclamation-triangle mr-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div class="space-y-4">
+                <!-- Submit Button -->
+                <button type="submit" id="access-btn" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:from-blue-600 hover:to-purple-700 hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100" disabled>
+                    <i class="fa-solid fa-unlock mr-2"></i>
+                    Acceder al Proyecto
+                </button>
+
+                <!-- Back Button -->
+                <button type="button" id="back-btn" onclick="history.back()" class="w-full bg-white bg-opacity-20 text-white py-3 rounded-xl font-medium transition-all duration-300 hover:bg-opacity-30 hover:shadow-lg">
+                    <i class="fa-solid fa-arrow-left mr-2"></i>
+                    Volver a la Galería
+                </button>
+            </div>
+        </form>
+
+        <!-- Additional Info -->
+        <div class="text-center mt-6">
+            <p class="text-white text-opacity-70 text-sm">
+                <i class="fa-solid fa-info-circle mr-1"></i>
+                Ingresa el PIN de 4 dígitos para acceder
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pinInputs = document.querySelectorAll('.pin-input');
+            const accessBtn = document.getElementById('access-btn');
+            const pinForm = document.getElementById('pin-form');
+            const hiddenPinInput = document.getElementById('pin');
+            const showPinCheckbox = document.getElementById('show-pin');
+            const pinAuthCard = document.getElementById('pin-auth-card');
+
+            // Focus first input on load
+            pinInputs[0].focus();
+
+            // Handle PIN input navigation and validation
+            pinInputs.forEach((input, index) => {
+                input.addEventListener('input', function(e) {
+                    const value = e.target.value;
+                    
+                    // Only allow numbers
+                    if (!/^[0-9]$/.test(value)) {
+                        e.target.value = '';
+                        return;
+                    }
+
+                    // Move to next input if current is filled
+                    if (value && index < pinInputs.length - 1) {
+                        pinInputs[index + 1].focus();
+                    }
+
+                    updateSubmitButton();
+                    updateHiddenPin();
+                });
+
+                input.addEventListener('keydown', function(e) {
+                    // Handle backspace
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        pinInputs[index - 1].focus();
+                        pinInputs[index - 1].value = '';
+                        updateSubmitButton();
+                        updateHiddenPin();
+                    }
+
+                    // Handle arrow keys
+                    if (e.key === 'ArrowLeft' && index > 0) {
+                        pinInputs[index - 1].focus();
+                    }
+                    if (e.key === 'ArrowRight' && index < pinInputs.length - 1) {
+                        pinInputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pasteData = e.clipboardData.getData('text');
+                    const digits = pasteData.replace(/\D/g, '').slice(0, 4);
+                    
+                    digits.split('').forEach((digit, i) => {
+                        if (pinInputs[i]) {
+                            pinInputs[i].value = digit;
+                        }
+                    });
+                    
+                    if (digits.length > 0) {
+                        const lastIndex = Math.min(digits.length - 1, 3);
+                        pinInputs[lastIndex].focus();
+                    }
+                    
+                    updateSubmitButton();
+                    updateHiddenPin();
+                });
+            });
+
+            // Update submit button state
+            function updateSubmitButton() {
+                const allFilled = Array.from(pinInputs).every(input => input.value.length === 1);
+                accessBtn.disabled = !allFilled;
+            }
+
+            // Update hidden PIN field
+            function updateHiddenPin() {
+                const pinValue = Array.from(pinInputs).map(input => input.value).join('');
+                hiddenPinInput.value = pinValue;
+            }
+
+            // Handle show/hide PIN
+            showPinCheckbox.addEventListener('change', function() {
+                const inputType = this.checked ? 'text' : 'password';
+                pinInputs.forEach(input => {
+                    input.type = inputType;
+                });
+            });
+
+            // Handle form submission
+            pinForm.addEventListener('submit', function(e) {
+                updateHiddenPin();
+                
+                // Add loading state
+                accessBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando...';
+                accessBtn.disabled = true;
+            });
+
+            // Add shake effect to card if there are error messages
+            const errorMessages = document.getElementById('error-messages');
+            if (errorMessages) {
+                pinAuthCard.classList.add('shake');
+                
+                // Clear inputs after error
+                setTimeout(() => {
+                    pinInputs.forEach(input => input.value = '');
+                    pinInputs[0].focus();
+                    updateSubmitButton();
+                    updateHiddenPin();
+                }, 500);
+            }
+
+            // Add pulse effect on focus
+            pinInputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.animation = 'pulse 0.3s ease-in-out';
+                });
+                
+                input.addEventListener('animationend', function() {
+                    this.style.animation = '';
+                });
+            });
+
+            // Auto-submit when all fields are filled (optional)
+            function checkAutoSubmit() {
+                const allFilled = Array.from(pinInputs).every(input => input.value.length === 1);
+                if (allFilled) {
+                    setTimeout(() => {
+                        updateHiddenPin();
+                        pinForm.submit();
+                    }, 300);
+                }
+            }
+
+            // Uncomment the next lines if you want auto-submit functionality
+            // pinInputs.forEach(input => {
+            //     input.addEventListener('input', checkAutoSubmit);
+            // });
+        });
+    </script>
+</body>
+</html>   

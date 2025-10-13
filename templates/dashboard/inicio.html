@@ -1,0 +1,938 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block page_title %}Algoritmos de Aprendizaje Supervisado{% endblock %}
+{% block page_subtitle %}Documentación técnica y especificaciones de algoritmos ML{% endblock %}
+
+{% block content %}
+<!-- Project Header -->
+<div class="bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white rounded-2xl p-8 mb-8 relative overflow-hidden">
+    <div class="absolute top-0 right-0 opacity-10">
+        <i class="fas fa-brain text-8xl transform rotate-12"></i>
+    </div>
+    <div class="relative z-10">
+        <h1 class="text-4xl font-bold mb-4">Dashboard de Algoritmos de Regresión</h1>
+        <p class="text-white/90 text-lg mb-6">
+            Trabajo Parcial de Unidad de Aprendizaje - Aprendizaje Supervisado<br>
+            Estudiante: <strong>{{ perfil.nombre_completo|title }}</strong>
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div class="bg-white/10 rounded-lg p-4">
+                <div class="text-2xl font-bold">6</div>
+                <div class="text-sm opacity-90">Algoritmos Implementados</div>
+            </div>
+            <div class="bg-white/10 rounded-lg p-4">
+                <div class="text-2xl font-bold">Regresión</div>
+                <div class="text-sm opacity-90">Tipo de Problema</div>
+            </div>
+            <div class="bg-white/10 rounded-lg p-4">
+                <div class="text-2xl font-bold">Python</div>
+                <div class="text-sm opacity-90">Tecnología Base</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Algorithms Cards Grid -->
+<div class="mb-8">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+        <i class="fas fa-cubes mr-3 text-blue-600"></i>
+        Algoritmos de Regresión Implementados
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Regresión Lineal -->
+        <div class="algorithm-card bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-blue-500"
+             onclick="openAlgorithmModal('regresion_lineal')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-chart-line text-blue-600 text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Regresión Lineal</h3>
+            <p class="text-gray-600 text-sm">Algoritmo de aprendizaje supervisado que modela la relación lineal entre variables independientes y la variable dependiente.</p>
+        </div>
+
+        <!-- Regresión Logística -->
+        <div class="algorithm-card bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-green-500"
+             onclick="openAlgorithmModal('regresion_logistica')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-percentage text-green-600 text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Regresión Logística</h3>
+            <p class="text-gray-600 text-sm">Algoritmo de clasificación que utiliza la función logística para modelar la probabilidad de pertenencia a clases.</p>
+        </div>
+
+        <!-- Ridge y Lasso -->
+        <div class="algorithm-card bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-purple-500"
+             onclick="openAlgorithmModal('ridge_lasso')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-balance-scale text-purple-600 text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Ridge y Lasso</h3>
+            <p class="text-gray-600 text-sm">Técnicas de regularización que extienden la regresión lineal para prevenir el sobreajuste mediante penalizaciones.</p>
+        </div>
+
+        <!-- Árbol de Regresión CART -->
+        <div class="algorithm-card bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-yellow-500"
+             onclick="openAlgorithmModal('arbol_cart')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-sitemap text-yellow-600 text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Árbol de Regresión CART</h3>
+            <p class="text-gray-600 text-sm">Algoritmo de árbol de decisión que realiza divisiones binarias recursivas para problemas de regresión.</p>
+        </div>
+
+        <!-- K-Nearest Neighbors -->
+        <div class="algorithm-card bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-red-500"
+             onclick="openAlgorithmModal('knn')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-users text-red-600 text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">K-Nearest Neighbors</h3>
+            <p class="text-gray-600 text-sm">Algoritmo de aprendizaje perezoso que predice basándose en los k vecinos más cercanos en el espacio de características.</p>
+        </div>
+
+        <!-- Red Neuronal para Regresión -->
+        <div class="algorithm-card bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-indigo-500"
+             onclick="openAlgorithmModal('red_neuronal')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-brain text-indigo-600 text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Red Neuronal para Regresión</h3>
+            <p class="text-gray-600 text-sm">Red neuronal artificial multicapa que puede modelar relaciones complejas no lineales entre variables.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Algorithm Theory Modal -->
+<div id="algorithmModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-2xl max-w-4xl max-h-[90vh] overflow-y-auto mx-4 w-full">
+        <div id="modalContent">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Algorithm modal functionality
+    window.openAlgorithmModal = function(algorithmType) {
+        const modal = document.getElementById('algorithmModal');
+        const modalContent = document.getElementById('modalContent');
+
+        const algorithms = {
+            'regresion_lineal': {
+                title: 'Regresión Lineal',
+                icon: 'fas fa-chart-line',
+                color: 'blue',
+                description: 'Modelado de relaciones lineales',
+                content: `
+                    <div class="p-8">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-chart-line text-blue-600 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-bold text-gray-800">Regresión Lineal</h2>
+                                <p class="text-gray-600">Modelado de relaciones lineales</p>
+                            </div>
+                            <button onclick="closeAlgorithmModal()" class="ml-auto text-gray-400 hover:text-gray-600 text-2xl">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-info-circle mr-2 text-blue-600"></i>Definición
+                                </h3>
+                                <p class="text-gray-700 leading-relaxed">
+                                    La regresión lineal es un algoritmo de aprendizaje supervisado que busca modelar la relación entre una variable dependiente (objetivo) y una o más variables independientes (predictoras) mediante una función lineal. Es uno de los métodos estadísticos más fundamentales y ampliamente utilizados.
+                                </p>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-cogs mr-2 text-blue-600"></i>Funcionamiento
+                                </h3>
+                                <p class="text-gray-700 mb-3">El modelo busca encontrar la mejor línea que se ajuste a los datos:</p>
+                                <div class="bg-gray-100 p-4 rounded-lg font-mono text-sm">
+                                    y = β₀ + β₁x₁ + β₂x₂ + ... + βₙxₙ + ε
+                                </div>
+                                <ul class="list-disc list-inside text-gray-700 mt-3 space-y-1">
+                                    <li>β₀: Intercepto (valor cuando todas las x son 0)</li>
+                                    <li>βᵢ: Coeficientes que representan el cambio en y por unidad de xᵢ</li>
+                                    <li>ε: Término de error</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-calculator mr-2 text-blue-600"></i>Método de Optimización
+                                </h3>
+                                <p class="text-gray-700 mb-3">Utiliza el método de mínimos cuadrados ordinarios (OLS):</p>
+                                <div class="bg-gray-100 p-4 rounded-lg font-mono text-sm">
+                                    min Σ(yᵢ - ŷᵢ)²
+                                </div>
+                                <p class="text-gray-700 mt-3">Donde ŷᵢ son las predicciones del modelo.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-lg font-bold text-green-800 mb-3">Ventajas</h3>
+                                    <ul class="list-disc list-inside text-green-700 space-y-1 text-sm">
+                                        <li>Simplicidad e interpretabilidad</li>
+                                        <li>Rápido entrenamiento y predicción</li>
+                                        <li>No requiere hiperparámetros</li>
+                                        <li>Baseline sólido para comparaciones</li>
+                                        <li>Solución analítica exacta</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-red-800 mb-3">Limitaciones</h3>
+                                    <ul class="list-disc list-inside text-red-700 space-y-1 text-sm">
+                                        <li>Asume relaciones lineales</li>
+                                        <li>Sensible a outliers</li>
+                                        <li>Problemas con multicolinealidad</li>
+                                        <li>Requiere normalización de datos</li>
+                                        <li>Overfitting con muchas características</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-code mr-2 text-blue-600"></i>Implementación
+                                </h3>
+                                <div class="bg-gray-900 text-gray-100 p-4 rounded-lg">
+                                    <pre class="text-sm"><code>from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Crear y entrenar el modelo
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Realizar predicciones
+y_pred = model.predict(X_test)
+
+# Evaluar el modelo
+r2 = r2_score(y_test, y_pred)
+mse = mean_squared_error(y_test, y_pred)</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            'regresion_logistica': {
+                title: 'Regresión Logística',
+                icon: 'fas fa-percentage',
+                color: 'green',
+                description: 'Clasificación binaria/multiclase',
+                content: `
+                    <div class="p-8">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-percentage text-green-600 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-bold text-gray-800">Regresión Logística</h2>
+                                <p class="text-gray-600">Clasificación binaria/multiclase</p>
+                            </div>
+                            <button onclick="closeAlgorithmModal()" class="ml-auto text-gray-400 hover:text-gray-600 text-2xl">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-info-circle mr-2 text-green-600"></i>Definición
+                                </h3>
+                                <p class="text-gray-700 leading-relaxed">
+                                    La regresión logística es un algoritmo de clasificación que utiliza la función logística (sigmoide) para modelar la probabilidad de que una instancia pertenezca a una clase particular. A pesar de su nombre, es usado para clasificación, no regresión.
+                                </p>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-cogs mr-2 text-green-600"></i>Funcionamiento
+                                </h3>
+                                <p class="text-gray-700 mb-3">Utiliza la función sigmoide para mapear valores reales a probabilidades entre 0 y 1:</p>
+                                <div class="bg-gray-100 p-4 rounded-lg font-mono text-sm">
+                                    p(y=1|x) = 1 / (1 + e^(-(β₀ + β₁x₁ + β₂x₂ + ... + βₙxₙ)))
+                                </div>
+                                <ul class="list-disc list-inside text-gray-700 mt-3 space-y-1">
+                                    <li>Transforma la salida lineal usando la función sigmoide</li>
+                                    <li>Utiliza máxima verosimilitud para optimizar parámetros</li>
+                                    <li>Clasifica según umbral de probabilidad (típicamente 0.5)</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-calculator mr-2 text-green-600"></i>Función de Costo
+                                </h3>
+                                <p class="text-gray-700 mb-3">Utiliza la función de log-verosimilitud:</p>
+                                <div class="bg-gray-100 p-4 rounded-lg font-mono text-sm">
+                                    J(θ) = -1/m Σ[y log(h(x)) + (1-y) log(1-h(x))]
+                                </div>
+                                <p class="text-gray-700 mt-3">Donde h(x) es la función sigmoide.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-lg font-bold text-green-800 mb-3">Ventajas</h3>
+                                    <ul class="list-disc list-inside text-green-700 space-y-1 text-sm">
+                                        <li>Proporciona probabilidades de clase</li>
+                                        <li>No asume distribución normal</li>
+                                        <li>Menos sensible a outliers</li>
+                                        <li>No requiere escalado de características</li>
+                                        <li>Eficiente computacionalmente</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-red-800 mb-3">Limitaciones</h3>
+                                    <ul class="list-disc list-inside text-red-700 space-y-1 text-sm">
+                                        <li>Asume relación lineal entre predictores y log-odds</li>
+                                        <li>Sensible a características irrelevantes</li>
+                                        <li>Requiere muestras grandes</li>
+                                        <li>Problemas con separación perfecta</li>
+                                        <li>Multicolinealidad afecta interpretación</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-code mr-2 text-green-600"></i>Implementación
+                                </h3>
+                                <div class="bg-gray-900 text-gray-100 p-4 rounded-lg">
+                                    <pre class="text-sm"><code>from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+
+# Crear y entrenar el modelo
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Realizar predicciones
+y_pred = model.predict(X_test)
+y_proba = model.predict_proba(X_test)
+
+# Evaluar el modelo
+accuracy = accuracy_score(y_test, y_pred)</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            'ridge_lasso': {
+                title: 'Ridge y Lasso',
+                icon: 'fas fa-balance-scale',
+                color: 'purple',
+                description: 'Técnicas de regularización',
+                content: `
+                    <div class="p-8">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-balance-scale text-purple-600 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-bold text-gray-800">Ridge y Lasso Regression</h2>
+                                <p class="text-gray-600">Técnicas de regularización</p>
+                            </div>
+                            <button onclick="closeAlgorithmModal()" class="ml-auto text-gray-400 hover:text-gray-600 text-2xl">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-info-circle mr-2 text-purple-600"></i>Definición
+                                </h3>
+                                <p class="text-gray-700 leading-relaxed">
+                                    Ridge y Lasso son técnicas de regularización que extienden la regresión lineal añadiendo penalizaciones a la función de costo para prevenir el sobreajuste y mejorar la generalización del modelo.
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-blue-50 p-4 rounded-lg">
+                                    <h4 class="text-lg font-bold text-blue-800 mb-3">Ridge Regression (L2)</h4>
+                                    <div class="bg-white p-3 rounded font-mono text-sm mb-3">
+                                        J = MSE + α Σβᵢ²
+                                    </div>
+                                    <ul class="text-blue-700 text-sm space-y-1">
+                                        <li>• Penaliza la suma de cuadrados de coeficientes</li>
+                                        <li>• Reduce coeficientes hacia cero</li>
+                                        <li>• Mantiene todas las características</li>
+                                        <li>• Útil con multicolinealidad</li>
+                                    </ul>
+                                </div>
+
+                                <div class="bg-green-50 p-4 rounded-lg">
+                                    <h4 class="text-lg font-bold text-green-800 mb-3">Lasso Regression (L1)</h4>
+                                    <div class="bg-white p-3 rounded font-mono text-sm mb-3">
+                                        J = MSE + α Σ|βᵢ|
+                                    </div>
+                                    <ul class="text-green-700 text-sm space-y-1">
+                                        <li>• Penaliza la suma de valores absolutos</li>
+                                        <li>• Puede llevar coeficientes a cero exacto</li>
+                                        <li>• Realiza selección automática de características</li>
+                                        <li>• Produce modelos dispersos</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-sliders-h mr-2 text-purple-600"></i>Parámetro de Regularización (α)
+                                </h3>
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <ul class="text-gray-700 space-y-2">
+                                        <li><strong>α = 0:</strong> Regresión lineal estándar (sin regularización)</li>
+                                        <li><strong>α pequeño:</strong> Poca regularización, similar a OLS</li>
+                                        <li><strong>α moderado:</strong> Balance entre sesgo y varianza</li>
+                                        <li><strong>α grande:</strong> Mucha regularización, modelos simples</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-lg font-bold text-green-800 mb-3">Ventajas</h3>
+                                    <ul class="list-disc list-inside text-green-700 space-y-1 text-sm">
+                                        <li>Previene sobreajuste efectivamente</li>
+                                        <li>Maneja multicolinealidad</li>
+                                        <li>Lasso hace selección de características</li>
+                                        <li>Mejora generalización</li>
+                                        <li>Control fino del trade-off sesgo-varianza</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-red-800 mb-3">Limitaciones</h3>
+                                    <ul class="list-disc list-inside text-red-700 space-y-1 text-sm">
+                                        <li>Requiere validación cruzada para α</li>
+                                        <li>Ridge no elimina características</li>
+                                        <li>Lasso puede ser inestable</li>
+                                        <li>Interpretación más compleja</li>
+                                        <li>Computacionalmente más costoso</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-code mr-2 text-purple-600"></i>Implementación
+                                </h3>
+                                <div class="bg-gray-900 text-gray-100 p-4 rounded-lg">
+                                    <pre class="text-sm"><code>from sklearn.linear_model import Ridge, Lasso
+from sklearn.model_selection import cross_val_score
+
+# Ridge Regression
+ridge = Ridge(alpha=1.0)
+ridge.fit(X_train, y_train)
+
+# Lasso Regression
+lasso = Lasso(alpha=0.1)
+lasso.fit(X_train, y_train)
+
+# Validación cruzada para seleccionar α
+alphas = [0.1, 1.0, 10.0, 100.0]
+ridge_scores = cross_val_score(Ridge(), X, y, cv=5)</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            'arbol_cart': {
+                title: 'Árbol de Regresión CART',
+                icon: 'fas fa-sitemap',
+                color: 'yellow',
+                description: 'Árboles de decisión para regresión',
+                content: `
+                    <div class="p-8">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-sitemap text-yellow-600 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-bold text-gray-800">Árbol de Regresión CART</h2>
+                                <p class="text-gray-600">Classification and Regression Trees</p>
+                            </div>
+                            <button onclick="closeAlgorithmModal()" class="ml-auto text-gray-400 hover:text-gray-600 text-2xl">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-info-circle mr-2 text-yellow-600"></i>Definición
+                                </h3>
+                                <p class="text-gray-700 leading-relaxed">
+                                    CART (Classification and Regression Trees) es un algoritmo que construye árboles de decisión binarios para problemas de regresión. Realiza divisiones recursivas del espacio de características para crear regiones homogéneas.
+                                </p>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-cogs mr-2 text-yellow-600"></i>Funcionamiento
+                                </h3>
+                                <div class="bg-yellow-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-yellow-800 mb-2">Proceso de Construcción:</h4>
+                                    <ol class="list-decimal list-inside text-yellow-700 space-y-1">
+                                        <li>Seleccionar la mejor división (característica + umbral)</li>
+                                        <li>Dividir el nodo en dos hijos</li>
+                                        <li>Repetir recursivamente hasta criterio de parada</li>
+                                        <li>Asignar valor promedio a nodos hoja</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-calculator mr-2 text-yellow-600"></i>Criterios de División
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-gray-100 p-4 rounded-lg">
+                                        <h4 class="font-semibold mb-2">Mean Squared Error (MSE)</h4>
+                                        <div class="font-mono text-sm">
+                                            MSE = 1/n Σ(yᵢ - ȳ)²
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-2">Criterio más común para regresión</p>
+                                    </div>
+                                    <div class="bg-gray-100 p-4 rounded-lg">
+                                        <h4 class="font-semibold mb-2">Mean Absolute Error (MAE)</h4>
+                                        <div class="font-mono text-sm">
+                                            MAE = 1/n Σ|yᵢ - ȳ|
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-2">Más robusto a outliers</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-stop mr-2 text-yellow-600"></i>Criterios de Parada
+                                </h3>
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <ul class="text-gray-700 space-y-1">
+                                        <li><strong>max_depth:</strong> Profundidad máxima del árbol</li>
+                                        <li><strong>min_samples_split:</strong> Mínimas muestras para dividir</li>
+                                        <li><strong>min_samples_leaf:</strong> Mínimas muestras en hoja</li>
+                                        <li><strong>min_impurity_decrease:</strong> Reducción mínima de impureza</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-lg font-bold text-green-800 mb-3">Ventajas</h3>
+                                    <ul class="list-disc list-inside text-green-700 space-y-1 text-sm">
+                                        <li>Fácil interpretación y visualización</li>
+                                        <li>No requiere escalado de datos</li>
+                                        <li>Maneja características categóricas</li>
+                                        <li>Captura interacciones no lineales</li>
+                                        <li>Selección automática de características</li>
+                                        <li>Robusto a outliers en características</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-red-800 mb-3">Limitaciones</h3>
+                                    <ul class="list-disc list-inside text-red-700 space-y-1 text-sm">
+                                        <li>Propenso a sobreajuste</li>
+                                        <li>Inestabilidad (pequeños cambios → árboles diferentes)</li>
+                                        <li>Sesgo hacia características con más valores</li>
+                                        <li>Dificultad con relaciones lineales</li>
+                                        <li>Predicciones en escalones</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-code mr-2 text-yellow-600"></i>Implementación
+                                </h3>
+                                <div class="bg-gray-900 text-gray-100 p-4 rounded-lg">
+                                    <pre class="text-sm"><code>from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import plot_tree
+
+# Crear y entrenar el modelo
+tree = DecisionTreeRegressor(
+    max_depth=5,
+    min_samples_split=10,
+    min_samples_leaf=5,
+    random_state=42
+)
+tree.fit(X_train, y_train)
+
+# Predicciones
+y_pred = tree.predict(X_test)
+
+# Importancia de características
+feature_importance = tree.feature_importances_</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            'knn': {
+                title: 'K-Nearest Neighbors',
+                icon: 'fas fa-users',
+                color: 'red',
+                description: 'Aprendizaje basado en instancias',
+                content: `
+                    <div class="p-8">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-users text-red-600 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-bold text-gray-800">K-Nearest Neighbors</h2>
+                                <p class="text-gray-600">Aprendizaje basado en instancias</p>
+                            </div>
+                            <button onclick="closeAlgorithmModal()" class="ml-auto text-gray-400 hover:text-gray-600 text-2xl">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-info-circle mr-2 text-red-600"></i>Definición
+                                </h3>
+                                <p class="text-gray-700 leading-relaxed">
+                                    K-Nearest Neighbors (KNN) es un algoritmo de aprendizaje perezoso que realiza predicciones basándose en los k vecinos más cercanos en el espacio de características. No construye un modelo explícito durante el entrenamiento.
+                                </p>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-cogs mr-2 text-red-600"></i>Funcionamiento
+                                </h3>
+                                <div class="bg-red-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-red-800 mb-2">Proceso de Predicción:</h4>
+                                    <ol class="list-decimal list-inside text-red-700 space-y-1">
+                                        <li>Calcular distancia desde el punto de consulta a todos los puntos de entrenamiento</li>
+                                        <li>Seleccionar los k vecinos más cercanos</li>
+                                        <li>Para regresión: promediar los valores objetivo de los k vecinos</li>
+                                        <li>Opcionalmente, ponderar por distancia inversa</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-ruler mr-2 text-red-600"></i>Métricas de Distancia
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-gray-100 p-4 rounded-lg">
+                                        <h4 class="font-semibold mb-2">Euclidiana</h4>
+                                        <div class="font-mono text-sm">
+                                            √Σ(xᵢ - yᵢ)²
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-2">Más común</p>
+                                    </div>
+                                    <div class="bg-gray-100 p-4 rounded-lg">
+                                        <h4 class="font-semibold mb-2">Manhattan</h4>
+                                        <div class="font-mono text-sm">
+                                            Σ|xᵢ - yᵢ|
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-2">Robusta</p>
+                                    </div>
+                                    <div class="bg-gray-100 p-4 rounded-lg">
+                                        <h4 class="font-semibold mb-2">Minkowski</h4>
+                                        <div class="font-mono text-sm">
+                                            (Σ|xᵢ - yᵢ|ᵖ)^(1/p)
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-2">Generalización</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-sliders-h mr-2 text-red-600"></i>Selección del Parámetro k
+                                </h3>
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <ul class="text-gray-700 space-y-2">
+                                        <li><strong>k pequeño (k=1):</strong> Muy sensible al ruido, alta varianza</li>
+                                        <li><strong>k moderado:</strong> Balance entre sesgo y varianza</li>
+                                        <li><strong>k grande:</strong> Más estable pero puede perder patrones locales</li>
+                                        <li><strong>Regla empírica:</strong> k = √n (donde n es el número de muestras)</li>
+                                        <li><strong>Validación cruzada:</strong> Método recomendado para selección óptima</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-lg font-bold text-green-800 mb-3">Ventajas</h3>
+                                    <ul class="list-disc list-inside text-green-700 space-y-1 text-sm">
+                                        <li>Simple de entender e implementar</li>
+                                        <li>No asume distribución de datos</li>
+                                        <li>Adaptable a nuevos datos</li>
+                                        <li>Efectivo con datasets pequeños</li>
+                                        <li>Puede capturar patrones complejos</li>
+                                        <li>No requiere entrenamiento</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-red-800 mb-3">Limitaciones</h3>
+                                    <ul class="list-disc list-inside text-red-700 space-y-1 text-sm">
+                                        <li>Computacionalmente costoso en predicción</li>
+                                        <li>Sensible a la escala de características</li>
+                                        <li>Maldición de la dimensionalidad</li>
+                                        <li>Requiere mucha memoria</li>
+                                        <li>Sensible a características irrelevantes</li>
+                                        <li>Pobre rendimiento con datos desbalanceados</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-code mr-2 text-red-600"></i>Implementación
+                                </h3>
+                                <div class="bg-gray-900 text-gray-100 p-4 rounded-lg">
+                                    <pre class="text-sm"><code>from sklearn.neighbors import KNeighborsRegressor
+from sklearn.preprocessing import StandardScaler
+
+# Normalizar características
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Crear y entrenar el modelo
+knn = KNeighborsRegressor(
+    n_neighbors=5,
+    weights='distance',  # Ponderación por distancia
+    metric='euclidean'
+)
+knn.fit(X_train_scaled, y_train)
+
+# Predicciones
+y_pred = knn.predict(X_test_scaled)</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            'red_neuronal': {
+                title: 'Red Neuronal para Regresión',
+                icon: 'fas fa-brain',
+                color: 'indigo',
+                description: 'Redes neuronales artificiales',
+                content: `
+                    <div class="p-8">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-brain text-indigo-600 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-bold text-gray-800">Red Neuronal para Regresión</h2>
+                                <p class="text-gray-600">Redes neuronales artificiales multicapa</p>
+                            </div>
+                            <button onclick="closeAlgorithmModal()" class="ml-auto text-gray-400 hover:text-gray-600 text-2xl">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-info-circle mr-2 text-indigo-600"></i>Definición
+                                </h3>
+                                <p class="text-gray-700 leading-relaxed">
+                                    Las redes neuronales artificiales son modelos computacionales inspirados en el funcionamiento del cerebro humano. Están compuestas por múltiples capas de neuronas interconectadas que pueden aprender patrones complejos y no lineales en los datos.
+                                </p>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-sitemap mr-2 text-indigo-600"></i>Arquitectura
+                                </h3>
+                                <div class="bg-indigo-50 p-4 rounded-lg">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div class="text-center">
+                                            <div class="w-16 h-16 bg-blue-200 rounded-full mx-auto mb-2 flex items-center justify-center">
+                                                <i class="fas fa-sign-in-alt text-blue-600"></i>
+                                            </div>
+                                            <h4 class="font-semibold text-indigo-800">Capa de Entrada</h4>
+                                            <p class="text-sm text-indigo-600">Recibe las características</p>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="w-16 h-16 bg-purple-200 rounded-full mx-auto mb-2 flex items-center justify-center">
+                                                <i class="fas fa-layer-group text-purple-600"></i>
+                                            </div>
+                                            <h4 class="font-semibold text-indigo-800">Capas Ocultas</h4>
+                                            <p class="text-sm text-indigo-600">Procesan información</p>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="w-16 h-16 bg-green-200 rounded-full mx-auto mb-2 flex items-center justify-center">
+                                                <i class="fas fa-sign-out-alt text-green-600"></i>
+                                            </div>
+                                            <h4 class="font-semibold text-indigo-800">Capa de Salida</h4>
+                                            <p class="text-sm text-indigo-600">Produce predicción</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-calculator mr-2 text-indigo-600"></i>Funcionamiento Matemático
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-gray-100 p-4 rounded-lg">
+                                        <h4 class="font-semibold mb-2">Propagación Hacia Adelante</h4>
+                                        <div class="font-mono text-sm space-y-1">
+                                            <div>z = W·x + b</div>
+                                            <div>a = f(z)</div>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-2">W: pesos, b: sesgo, f: función de activación</p>
+                                    </div>
+                                    <div class="bg-gray-100 p-4 rounded-lg">
+                                        <h4 class="font-semibold mb-2">Retropropagación</h4>
+                                        <div class="font-mono text-sm space-y-1">
+                                            <div>∂L/∂W = ∂L/∂a · ∂a/∂z · ∂z/∂W</div>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-2">Algoritmo para ajustar pesos</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-wave-square mr-2 text-indigo-600"></i>Funciones de Activación
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-gray-100 p-3 rounded-lg">
+                                        <h4 class="font-semibold mb-1">ReLU</h4>
+                                        <div class="font-mono text-xs">f(x) = max(0, x)</div>
+                                        <p class="text-xs text-gray-600 mt-1">Más popular</p>
+                                    </div>
+                                    <div class="bg-gray-100 p-3 rounded-lg">
+                                        <h4 class="font-semibold mb-1">Sigmoid</h4>
+                                        <div class="font-mono text-xs">f(x) = 1/(1+e^(-x))</div>
+                                        <p class="text-xs text-gray-600 mt-1">Output entre 0-1</p>
+                                    </div>
+                                    <div class="bg-gray-100 p-3 rounded-lg">
+                                        <h4 class="font-semibold mb-1">Tanh</h4>
+                                        <div class="font-mono text-xs">f(x) = tanh(x)</div>
+                                        <p class="text-xs text-gray-600 mt-1">Output entre -1 y 1</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-lg font-bold text-green-800 mb-3">Ventajas</h3>
+                                    <ul class="list-disc list-inside text-green-700 space-y-1 text-sm">
+                                        <li>Captura relaciones no lineales complejas</li>
+                                        <li>Aproximador universal de funciones</li>
+                                        <li>Flexible y versátil</li>
+                                        <li>Buena escalabilidad con datos grandes</li>
+                                        <li>Puede manejar múltiples salidas</li>
+                                        <li>Automatic feature learning</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-red-800 mb-3">Limitaciones</h3>
+                                    <ul class="list-disc list-inside text-red-700 space-y-1 text-sm">
+                                        <li>Modelo caja negra (poca interpretabilidad)</li>
+                                        <li>Requiere mucho tiempo de entrenamiento</li>
+                                        <li>Sensible a la inicialización</li>
+                                        <li>Muchos hiperparámetros que ajustar</li>
+                                        <li>Propenso a sobreajuste</li>
+                                        <li>Requiere normalización de datos</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-code mr-2 text-indigo-600"></i>Implementación
+                                </h3>
+                                <div class="bg-gray-900 text-gray-100 p-4 rounded-lg">
+                                    <pre class="text-sm"><code>from sklearn.neural_network import MLPRegressor
+from sklearn.preprocessing import StandardScaler
+
+# Normalizar datos
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Crear y entrenar el modelo
+mlp = MLPRegressor(
+    hidden_layer_sizes=(100, 50),  # 2 capas ocultas
+    activation='relu',
+    solver='adam',
+    max_iter=1000,
+    random_state=42
+)
+mlp.fit(X_train_scaled, y_train)
+
+# Predicciones
+y_pred = mlp.predict(X_test_scaled)</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        const algorithm = algorithms[algorithmType];
+        if (algorithm) {
+            modalContent.innerHTML = algorithm.content;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+    };
+
+    window.closeAlgorithmModal = function() {
+        const modal = document.getElementById('algorithmModal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    };
+
+    // Close modal when clicking outside
+    document.getElementById('algorithmModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAlgorithmModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeAlgorithmModal();
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block page_title %}Modelo{% endblock %}
+{% block page_subtitle %}Selecciona y entrena tu algoritmo{% endblock %}
+
+{% block content %}
+<!-- Selección de Algoritmo -->
+<div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+    <h2 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-robot mr-3 text-purple-500"></i>
+        Seleccionar Algoritmo
+    </h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {% for value, label in algoritmos %}
+            <label class="cursor-pointer">
+                <input type="radio" name="algoritmo" value="{{ value }}" class="hidden peer"
+                       {% if perfil.algoritmo_elegido == value %}checked{% endif %}>
+                <div class="border-2 border-gray-300 rounded-xl p-4 peer-checked:border-purple-500 peer-checked:bg-purple-50 hover:border-purple-300 transition-all">
+                    <div class="font-semibold text-gray-800">{{ label }}</div>
+                </div>
+            </label>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="bg-gradient-main text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all">
+            <i class="fas fa-check mr-2"></i>
+            Guardar Algoritmo
+        </button>
+    </form>
+</div>
+
+<!-- Entrenar Modelo -->
+{% if perfil.algoritmo_elegido and perfil.dataset_archivo %}
+<div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+    <h2 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-play mr-3 text-green-500"></i>
+        Entrenar Modelo
+    </h2>
+
+    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+        <div class="flex items-start">
+            <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+            <div>
+                <p class="font-semibold text-blue-800">Algoritmo seleccionado:</p>
+                <p class="text-blue-700">{{ perfil.get_algoritmo_elegido_display }}</p>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="entrenar" value="1">
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Tamaño del conjunto de prueba (%)</label>
+            <input type="number" name="test_size" value="30" min="10" max="50" step="5"
+                   class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+            <p class="text-sm text-gray-500 mt-1">Porcentaje de datos para validación (generalmente 20-30%)</p>
+        </div>
+
+        <button type="submit" class="bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-3 rounded-lg hover:shadow-lg transition-all">
+            <i class="fas fa-play mr-2"></i>
+            Entrenar Modelo
+        </button>
+    </form>
+</div>
+
+<!-- Métricas del Modelo -->
+{% if perfil.metricas %}
+<div class="bg-white rounded-2xl p-6 shadow-lg">
+    <h2 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-chart-bar mr-3 text-blue-500"></i>
+        Métricas del Modelo
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {% for metrica, valor in perfil.metricas.items %}
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl">
+            <h3 class="text-sm font-semibold text-gray-600 mb-1">{{ metrica }}</h3>
+            <p class="text-2xl font-bold text-purple-700">{{ valor|floatformat:4 }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% elif not perfil.dataset_archivo %}
+<div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+    <div class="flex items-start">
+        <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
+        <div>
+            <p class="font-semibold text-yellow-800">Dataset requerido</p>
+            <p class="text-yellow-700">Primero debes cargar un dataset en la sección "Datos"</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,437 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block page_title %}Configuración{% endblock %}
+{% block page_subtitle %}Ajustes del proyecto y preferencias del usuario{% endblock %}
+
+{% block content %}
+<!-- Profile Settings -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Profile Card -->
+    <div class="lg:col-span-2 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl p-8 relative overflow-hidden">
+        <div class="absolute top-0 right-0 opacity-20">
+            <i class="fas fa-user-cog text-8xl transform rotate-12"></i>
+        </div>
+        <div class="relative z-10">
+            <h2 class="text-3xl font-bold mb-4">Configuración del Perfil</h2>
+            <p class="text-white/90 text-lg mb-6">
+                Personaliza tu experiencia y configura las preferencias de tu proyecto de Machine Learning.
+            </p>
+            <div class="flex items-center space-x-4">
+                {% if perfil.avatar %}
+                    <img src="{{ perfil.avatar.url }}" alt="{{ perfil.nombre_completo }}"
+                         class="w-16 h-16 rounded-full border-3 border-white/30 object-cover">
+                {% else %}
+                    <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">
+                        {{ perfil.nombre_completo|first|upper }}
+                    </div>
+                {% endif %}
+                <div>
+                    <h3 class="text-xl font-semibold">{{ perfil.nombre_completo|title }}</h3>
+                    <p class="text-white/80">Miembro desde {{ perfil.fecha_registro|date:"F Y" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="space-y-4">
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Proyectos Activos</p>
+                    <p class="text-2xl font-bold text-gray-800">1</p>
+                </div>
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-project-diagram text-white text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Modelos Entrenados</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ perfil.modelos_entrenados|default:0 }}</p>
+                </div>
+                <div class="w-16 h-16 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-robot text-white text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Configuration Sections -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Personal Information -->
+    <div class="bg-white rounded-2xl p-6 shadow-lg">
+        <h3 class="text-xl font-bold mb-6 flex items-center">
+            <i class="fas fa-user mr-3 text-blue-500"></i>
+            Información Personal
+        </h3>
+        <form class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
+                <input type="text" value="{{ perfil.nombre_completo }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" value="{{ perfil.email|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Biografía</label>
+                <textarea rows="3" placeholder="Cuéntanos sobre ti y tu experiencia en ML..."
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">{{ perfil.biografia|default:'' }}</textarea>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                <i class="fas fa-save mr-2"></i>Guardar Cambios
+            </button>
+        </form>
+    </div>
+
+    <!-- Project Settings -->
+    <div class="bg-white rounded-2xl p-6 shadow-lg">
+        <h3 class="text-xl font-bold mb-6 flex items-center">
+            <i class="fas fa-cogs mr-3 text-purple-500"></i>
+            Configuración del Proyecto
+        </h3>
+        <form class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del Proyecto</label>
+                <input type="text" value="{{ perfil.nombre_proyecto|default:'Mi Proyecto ML' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                <textarea rows="2" placeholder="Describe brevemente tu proyecto..."
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">{{ perfil.descripcion_proyecto|default:'' }}</textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Problema</label>
+                <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <option value="clasificacion" {% if perfil.tipo_problema == 'clasificacion' %}selected{% endif %}>Clasificación</option>
+                    <option value="regresion" {% if perfil.tipo_problema == 'regresion' %}selected{% endif %}>Regresión</option>
+                    <option value="clustering" {% if perfil.tipo_problema == 'clustering' %}selected{% endif %}>Clustering</option>
+                </select>
+            </div>
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <h4 class="font-medium text-gray-800">Proyecto Público</h4>
+                    <p class="text-sm text-gray-600">Mostrar en la galería pública</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" {% if perfil.publico %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            <button type="submit" class="w-full bg-purple-500 text-white py-3 rounded-lg hover:bg-purple-600 transition-colors">
+                <i class="fas fa-save mr-2"></i>Actualizar Proyecto
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Data Management -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Data Storage -->
+    <div class="bg-white rounded-2xl p-6 shadow-lg">
+        <h3 class="text-xl font-bold mb-6 flex items-center">
+            <i class="fas fa-database mr-3 text-green-500"></i>
+            Gestión de Datos
+        </h3>
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <h4 class="font-medium text-gray-800">Dataset Actual</h4>
+                    <p class="text-sm text-gray-600">{{ perfil.dataset_nombre|default:"No hay dataset cargado" }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-lg font-bold text-green-600">{{ perfil.dataset_size|default:"0" }} MB</p>
+                    <p class="text-xs text-gray-500">Tamaño</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <h4 class="font-medium text-gray-800">Espacio Utilizado</h4>
+                    <p class="text-sm text-gray-600">Almacenamiento del proyecto</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-lg font-bold text-blue-600">{{ perfil.storage_used|default:"0" }}/100 MB</p>
+                    <div class="w-24 bg-gray-200 rounded-full h-2 mt-1">
+                        <div class="bg-blue-500 h-2 rounded-full" style="width: {{ perfil.storage_percentage|default:5 }}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors text-sm">
+                    <i class="fas fa-trash mr-2"></i>Limpiar Cache
+                </button>
+                <button class="bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors text-sm">
+                    <i class="fas fa-download mr-2"></i>Backup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security & Privacy -->
+    <div class="bg-white rounded-2xl p-6 shadow-lg">
+        <h3 class="text-xl font-bold mb-6 flex items-center">
+            <i class="fas fa-shield-alt mr-3 text-red-500"></i>
+            Seguridad y Privacidad
+        </h3>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Cambiar PIN</label>
+                <div class="flex space-x-2">
+                    <input type="password" placeholder="PIN actual"
+                           class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    <input type="password" placeholder="Nuevo PIN"
+                           class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                        <h4 class="font-medium text-gray-800">Autenticación de 2 Factores</h4>
+                        <p class="text-xs text-gray-600">Seguridad adicional</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                    </label>
+                </div>
+
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                        <h4 class="font-medium text-gray-800">Notificaciones Email</h4>
+                        <p class="text-xs text-gray-600">Recibir actualizaciones</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                    </label>
+                </div>
+            </div>
+
+            <button class="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors">
+                <i class="fas fa-key mr-2"></i>Actualizar Seguridad
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Advanced Settings -->
+<div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+    <h3 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-sliders-h mr-3 text-orange-500"></i>
+        Configuración Avanzada
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Performance Settings -->
+        <div class="space-y-4">
+            <h4 class="font-semibold text-gray-800 border-b pb-2">Rendimiento</h4>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Threads para Entrenamiento</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+                    <option value="auto">Automático</option>
+                    <option value="1">1 Thread</option>
+                    <option value="2">2 Threads</option>
+                    <option value="4">4 Threads</option>
+                    <option value="8">8 Threads</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Memoria Máxima (GB)</label>
+                <input type="range" min="1" max="16" value="4" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>1GB</span>
+                    <span>16GB</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Algorithm Defaults -->
+        <div class="space-y-4">
+            <h4 class="font-semibold text-gray-800 border-b pb-2">Algoritmos por Defecto</h4>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Para Clasificación</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+                    <option value="random_forest">Random Forest</option>
+                    <option value="svm">SVM</option>
+                    <option value="logistic_regression">Regresión Logística</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Para Regresión</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+                    <option value="linear_regression">Regresión Linear</option>
+                    <option value="random_forest">Random Forest</option>
+                    <option value="gradient_boost">Gradient Boosting</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Export Settings -->
+        <div class="space-y-4">
+            <h4 class="font-semibold text-gray-800 border-b pb-2">Exportación</h4>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Formato Preferido</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+                    <option value="pdf">PDF</option>
+                    <option value="excel">Excel</option>
+                    <option value="csv">CSV</option>
+                    <option value="json">JSON</option>
+                </select>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <input type="checkbox" id="auto-export" class="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500">
+                <label for="auto-export" class="text-sm font-medium text-gray-700">Auto-exportar resultados</label>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <input type="checkbox" id="include-code" class="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500" checked>
+                <label for="include-code" class="text-sm font-medium text-gray-700">Incluir código Python</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-end mt-6">
+        <button class="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors">
+            <i class="fas fa-save mr-2"></i>Guardar Configuración Avanzada
+        </button>
+    </div>
+</div>
+
+<!-- Danger Zone -->
+<div class="bg-red-50 border border-red-200 rounded-2xl p-6">
+    <h3 class="text-xl font-bold mb-4 flex items-center text-red-700">
+        <i class="fas fa-exclamation-triangle mr-3"></i>
+        Zona de Peligro
+    </h3>
+    <p class="text-red-600 mb-6">Las siguientes acciones son permanentes y no se pueden deshacer.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <button class="bg-red-100 text-red-700 py-3 px-4 rounded-lg hover:bg-red-200 transition-colors border border-red-300">
+            <i class="fas fa-trash mr-2"></i>Eliminar Dataset
+        </button>
+        <button class="bg-red-100 text-red-700 py-3 px-4 rounded-lg hover:bg-red-200 transition-colors border border-red-300">
+            <i class="fas fa-robot mr-2"></i>Resetear Modelo
+        </button>
+        <button class="bg-red-100 text-red-700 py-3 px-4 rounded-lg hover:bg-red-200 transition-colors border border-red-300">
+            <i class="fas fa-chart-line mr-2"></i>Borrar Resultados
+        </button>
+        <button class="bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors">
+            <i class="fas fa-user-times mr-2"></i>Eliminar Proyecto
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            console.log('Guardando configuración:', Object.fromEntries(formData));
+
+            // Show success message
+            showNotification('Configuración guardada exitosamente', 'success');
+        });
+    });
+
+    // Memory slider
+    const memorySlider = document.querySelector('input[type="range"]');
+    if (memorySlider) {
+        const memoryValue = document.createElement('div');
+        memoryValue.className = 'text-center text-sm font-medium text-gray-700 mt-2';
+        memorySlider.parentNode.insertBefore(memoryValue, memorySlider.nextSibling);
+
+        function updateMemoryValue() {
+            memoryValue.textContent = `${memorySlider.value} GB`;
+        }
+
+        memorySlider.addEventListener('input', updateMemoryValue);
+        updateMemoryValue();
+    }
+
+    // Danger zone actions
+    document.querySelectorAll('.bg-red-100, .bg-red-600').forEach(button => {
+        button.addEventListener('click', function() {
+            const action = this.textContent.trim();
+            if (confirm(`¿Estás seguro que deseas ${action.toLowerCase()}? Esta acción no se puede deshacer.`)) {
+                console.log(`Ejecutando: ${action}`);
+                showNotification(`${action} ejecutado`, 'warning');
+            }
+        });
+    });
+
+    // Notification function
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-medium transition-all transform translate-x-full`;
+
+        switch(type) {
+            case 'success':
+                notification.classList.add('bg-green-500');
+                break;
+            case 'warning':
+                notification.classList.add('bg-orange-500');
+                break;
+            case 'error':
+                notification.classList.add('bg-red-500');
+                break;
+            default:
+                notification.classList.add('bg-blue-500');
+        }
+
+        notification.innerHTML = `
+            <div class="flex items-center justify-between">
+                <span>${message}</span>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.remove('translate-x-full');
+        }, 100);
+
+        setTimeout(() => {
+            notification.classList.add('translate-x-full');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    // Auto-save functionality
+    let autoSaveTimer;
+    document.querySelectorAll('input, select, textarea').forEach(input => {
+        input.addEventListener('input', function() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                console.log('Auto-guardando...');
+                showNotification('Cambios guardados automáticamente', 'info');
+            }, 2000);
+        });
+    });
+});
+</script>
+{% endblock %}

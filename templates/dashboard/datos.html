@@ -1,0 +1,240 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block page_title %}Gestión de Datos{% endblock %}
+{% block page_subtitle %}Carga y visualiza tu dataset{% endblock %}
+
+{% block content %}
+<!-- Upload Section -->
+{% if not perfil.dataset_nombre %}
+<div class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+    <div class="text-center">
+        <div class="w-24 h-24 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-cloud-upload-alt text-white text-3xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-4">Subir Dataset</h2>
+        <p class="text-gray-600 mb-8 max-w-md mx-auto">
+            Carga tu archivo CSV para comenzar
+        </p>
+
+        <!-- Upload Form -->
+        <form method="POST" enctype="multipart/form-data" id="upload-form">
+            {% csrf_token %}
+            <div class="mb-6">
+                <input type="file" id="file-input" name="dataset_archivo" class="hidden" accept=".csv">
+                <button type="button" id="file-select-btn" class="bg-gradient-main text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all">
+                    <i class="fas fa-file-csv mr-2"></i>
+                    Seleccionar Archivo CSV
+                </button>
+            </div>
+
+            <!-- File Info -->
+            <div id="file-info" class="hidden bg-gray-50 rounded-lg p-4 mb-6 max-w-md mx-auto">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-file-csv text-green-500 text-xl mr-3"></i>
+                        <div>
+                            <p id="file-name" class="font-medium"></p>
+                            <p id="file-size" class="text-sm text-gray-500"></p>
+                        </div>
+                    </div>
+                    <button type="button" id="remove-file" class="text-red-500 hover:text-red-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Upload Button -->
+            <button type="submit" id="upload-btn" class="bg-gradient-main text-white px-8 py-3 rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <i class="fas fa-upload mr-2"></i>
+                Subir Dataset
+            </button>
+        </form>
+    </div>
+</div>
+{% else %}
+<!-- Dataset Info -->
+<div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold flex items-center">
+            <i class="fas fa-database mr-3 text-blue-500"></i>
+            Dataset Cargado
+        </h2>
+        <form method="POST" action="{% url 'dashboard_datos' perfil.id %}" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="eliminar_dataset" value="1">
+            <button type="submit" class="text-red-600 hover:text-red-700 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors flex items-center">
+                <i class="fas fa-trash mr-2"></i>
+                Cambiar Dataset
+            </button>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-100 p-4 rounded-xl">
+            <h3 class="font-semibold text-gray-700 mb-2">Nombre del Archivo</h3>
+            <p class="text-blue-700 font-medium">{{ perfil.dataset_nombre }}</p>
+        </div>
+        <div class="bg-gradient-to-r from-green-50 to-emerald-100 p-4 rounded-xl">
+            <h3 class="font-semibold text-gray-700 mb-2">Filas</h3>
+            <p class="text-green-700 font-medium text-2xl">{% if dataset_info %}{{ dataset_info.rows }}{% else %}0{% endif %}</p>
+        </div>
+        <div class="bg-gradient-to-r from-purple-50 to-violet-100 p-4 rounded-xl">
+            <h3 class="font-semibold text-gray-700 mb-2">Columnas</h3>
+            <p class="text-purple-700 font-medium text-2xl">{% if dataset_info %}{{ dataset_info.columns }}{% else %}0{% endif %}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Data Preview -->
+<div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+    <h3 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-table mr-3 text-green-500"></i>
+        Primeras 5 Filas
+    </h3>
+
+    <!-- Data Table -->
+    <div class="overflow-x-auto">
+        {% if preview_columns and preview_data %}
+        <table class="w-full table-auto border-collapse">
+            <thead>
+                <tr class="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                    {% for col in preview_columns %}
+                    <th class="text-left p-3 font-semibold {% if forloop.last %}bg-yellow-500{% endif %}">
+                        {{ col }}
+                        {% if forloop.last %}
+                        <i class="fas fa-bullseye ml-1 text-xs"></i>
+                        {% endif %}
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in preview_data %}
+                <tr class="border-b hover:bg-gray-50">
+                    {% for value in row %}
+                    <td class="p-3 {% if forloop.last %}bg-yellow-50 font-semibold text-yellow-900{% endif %}">{{ value }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-8 text-gray-500">
+            <i class="fas fa-table text-4xl mb-4"></i>
+            <p>No hay datos para mostrar.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Explicación de Variables -->
+    {% if preview_columns %}
+    <div class="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-6">
+        <h3 class="text-lg font-bold text-purple-900 mb-4 flex items-center">
+            <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>
+            ¿Cómo interpretará el modelo tus datos?
+        </h3>
+
+        <div class="grid md:grid-cols-2 gap-4 mb-4">
+            <div class="bg-white rounded-lg p-4 border-2 border-green-300">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-arrow-right text-green-600 mr-2"></i>
+                    <h4 class="font-bold text-green-800">Variables Predictoras (X)</h4>
+                </div>
+                <p class="text-sm text-gray-600 mb-3">Características que el modelo usa para hacer predicciones</p>
+                <div class="bg-green-50 p-3 rounded max-h-32 overflow-y-auto">
+                    {% for col in preview_columns %}
+                        {% if not forloop.last %}
+                            <span class="bg-green-200 px-2 py-1 rounded mr-1 mb-1 inline-block text-xs">{{ col }}</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Total: {{ preview_columns|length|add:"-1" }} variables</p>
+            </div>
+
+            <div class="bg-white rounded-lg p-4 border-2 border-blue-300">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-bullseye text-blue-600 mr-2"></i>
+                    <h4 class="font-bold text-blue-800">Variable Objetivo (Y)</h4>
+                </div>
+                <p class="text-sm text-gray-600 mb-3">Lo que el modelo intenta predecir</p>
+                <div class="bg-blue-50 p-3 rounded text-center">
+                    <span class="bg-blue-300 px-4 py-2 rounded inline-block font-bold text-blue-900">
+                        {{ preview_columns|last }}
+                    </span>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 text-center">Última columna del dataset</p>
+            </div>
+        </div>
+
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
+            <p class="text-sm text-yellow-800 flex items-start">
+                <i class="fas fa-exclamation-triangle mr-2 mt-1"></i>
+                <span>
+                    <strong>Importante:</strong> El sistema usa automáticamente la <strong>última columna</strong> como variable objetivo.
+                    Si quieres predecir otra variable, reorganiza tu CSV para que esté al final.
+                </span>
+            </p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // File upload functionality
+    const fileInput = document.getElementById('file-input');
+    const fileSelectBtn = document.getElementById('file-select-btn');
+    const fileInfo = document.getElementById('file-info');
+    const uploadBtn = document.getElementById('upload-btn');
+
+    // File select button
+    if (fileSelectBtn) {
+        fileSelectBtn.addEventListener('click', () => fileInput.click());
+    }
+
+    // File input change
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                const file = files[0];
+                // Show file info
+                document.getElementById('file-name').textContent = file.name;
+                document.getElementById('file-size').textContent = formatFileSize(file.size);
+                fileInfo.classList.remove('hidden');
+                uploadBtn.disabled = false;
+            }
+        });
+    }
+
+    // Remove file
+    document.getElementById('remove-file')?.addEventListener('click', function() {
+        fileInfo.classList.add('hidden');
+        uploadBtn.disabled = true;
+        fileInput.value = '';
+    });
+
+    // Upload form submission
+    const uploadForm = document.getElementById('upload-form');
+    uploadForm?.addEventListener('submit', function(e) {
+        const uploadBtn = document.getElementById('upload-btn');
+        if (uploadBtn) {
+            // Show loading state
+            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Subiendo...';
+            uploadBtn.disabled = true;
+        }
+    });
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+});
+</script>
+{% endblock %}
