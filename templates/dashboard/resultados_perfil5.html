@@ -1,0 +1,727 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block page_title %}Resultados{% endblock %}
+{% block page_subtitle %}Análisis y visualización de métricas del modelo{% endblock %}
+
+{% block content %}
+<!-- Model Performance Overview -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Main Performance Card -->
+    <div class="lg:col-span-2 bg-gradient-to-br from-rose-500 to-pink-600 text-white rounded-2xl p-8 relative overflow-hidden">
+        <div class="absolute top-0 right-0 opacity-20">
+            <i class="fas fa-heartbeat text-8xl transform rotate-12"></i>
+        </div>
+        <div class="relative z-10">
+            <h2 class="text-3xl font-bold mb-4">Rendimiento del Modelo</h2>
+            <p class="text-white/90 text-lg mb-6">
+                {% if perfil.tiene_modelo_entrenado %}
+                    Tu modelo de {{ perfil.get_algoritmo_elegido_display }} ha sido entrenado exitosamente para clasificar niveles de anemia en gestantes.
+                {% else %}
+                    Entrena tu modelo para ver los resultados aquí.
+                {% endif %}
+            </p>
+            {% if not perfil.tiene_modelo_entrenado %}
+                <a href="{% url 'dashboard_modelo' perfil.id %}" class="bg-white/20 text-white px-6 py-2 rounded-lg hover:bg-white/30 transition-colors">
+                    <i class="fas fa-play mr-2"></i>Entrenar Modelo
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Model Status -->
+    <div class="space-y-4">
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Estado del Modelo</p>
+                    <p class="text-lg font-semibold text-gray-800">
+                        {% if perfil.tiene_modelo_entrenado %}
+                            <span class="text-green-600">Entrenado</span>
+                        {% else %}
+                            <span class="text-orange-600">Pendiente</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="w-16 h-16 rounded-full flex items-center justify-center
+                    {% if perfil.tiene_modelo_entrenado %}bg-gradient-to-r from-green-400 to-green-500{% else %}bg-gradient-to-r from-orange-400 to-orange-500{% endif %}">
+                    <i class="fas {% if perfil.tiene_modelo_entrenado %}fa-check{% else %}fa-clock{% endif %} text-white text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Tiempo Entrenamiento</p>
+                    <p class="text-lg font-semibold text-gray-800">
+                        {{ perfil.tiempo_entrenamiento|default:"--:--" }}
+                    </p>
+                </div>
+                <div class="w-16 h-16 bg-gradient-to-r from-rose-400 to-pink-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-stopwatch text-white text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if perfil.metricas %}
+<!-- PROYECTO - Información destacada -->
+<div class="bg-gradient-to-r from-rose-50 to-pink-50 border-l-4 border-rose-600 rounded-xl p-6 mb-8 shadow-lg">
+    <div class="flex items-center mb-4">
+        <i class="fas fa-heartbeat text-rose-600 text-2xl mr-3"></i>
+        <h3 class="text-xl font-bold text-rose-800">PROYECTO - Clasificación de Anemia en Gestantes - Puno 2025</h3>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mb-4">
+        <div class="bg-white rounded-lg p-4 border-l-4 border-rose-500">
+            <p class="text-sm text-gray-600 mb-2">Algoritmo utilizado:</p>
+            <p class="text-lg font-bold text-rose-900">{{ perfil.get_algoritmo_elegido_display }}</p>
+            <p class="text-xs text-gray-500 mt-1">Clasificación Multiclase (4 categorías)</p>
+        </div>
+        <div class="bg-white rounded-lg p-4 border-l-4 border-purple-500">
+            <p class="text-sm text-gray-600 mb-2">Datos de entrenamiento:</p>
+            <p class="text-lg font-bold text-purple-900">{{ perfil.metricas.Train_Size|default:"--" }} gestantes</p>
+        </div>
+        <div class="bg-white rounded-lg p-4 border-l-4 border-orange-500">
+            <p class="text-sm text-gray-600 mb-2">Datos de prueba:</p>
+            <p class="text-lg font-bold text-orange-900">{{ perfil.metricas.Test_Size|default:"--" }} gestantes</p>
+        </div>
+    </div>
+
+    <!-- Categorías de Clasificación -->
+    <div class="bg-white rounded-lg p-4">
+        <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+            <i class="fas fa-list-ul text-rose-500 mr-2"></i>
+            Categorías de Anemia (Criterios OMS)
+        </h4>
+        <div class="grid md:grid-cols-4 gap-3">
+            <div class="bg-green-50 border-l-4 border-green-500 p-3 rounded">
+                <p class="text-xs text-gray-600">Normal</p>
+                <p class="font-bold text-green-700">≥ 11.0 g/dL</p>
+            </div>
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded">
+                <p class="text-xs text-gray-600">Anemia Leve</p>
+                <p class="font-bold text-yellow-700">10.0 - 10.9 g/dL</p>
+            </div>
+            <div class="bg-orange-50 border-l-4 border-orange-500 p-3 rounded">
+                <p class="text-xs text-gray-600">Anemia Moderada</p>
+                <p class="font-bold text-orange-700">7.0 - 9.9 g/dL</p>
+            </div>
+            <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded">
+                <p class="text-xs text-gray-600">Anemia Severa</p>
+                <p class="font-bold text-red-700">&lt; 7.0 g/dL</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Validación Cruzada (si existe) -->
+    {% if perfil.metricas.CV_Mean_Score %}
+    <div class="bg-white rounded-lg p-4 mt-4">
+        <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+            <i class="fas fa-sync-alt text-rose-500 mr-2"></i>
+            Validación Cruzada (5-Fold CV)
+        </h4>
+        <div class="grid md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm text-gray-600">Accuracy Promedio CV:</p>
+                <p class="text-2xl font-bold text-rose-600">{{ perfil.metricas.CV_Mean_Score|floatformat:4 }} ± {{ perfil.metricas.CV_Std_Score|floatformat:4 }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Mejor Accuracy (Hiperparámetros):</p>
+                <p class="text-2xl font-bold text-green-600">{{ perfil.metricas.Best_CV_Score|floatformat:4 }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Advertencia sobre métricas bajas -->
+{% if perfil.metricas.Accuracy and perfil.metricas.Accuracy < 0.6 %}
+<div class="bg-yellow-50 border-l-4 border-yellow-500 rounded-xl p-6 mb-8">
+    <div class="flex items-start">
+        <i class="fas fa-exclamation-triangle text-yellow-600 text-2xl mr-4 mt-1"></i>
+        <div>
+            <h3 class="text-lg font-bold text-yellow-800 mb-2">Advertencia: Accuracy Bajo ({{ perfil.metricas.Accuracy|floatformat:4 }})</h3>
+            <p class="text-yellow-900 mb-3">
+                El modelo clasifica correctamente solo el <strong>{{ perfil.metricas.Accuracy|floatformat:2 }}%</strong> de los casos.
+                Esto indica que el modelo tiene dificultades para diferenciar entre los niveles de anemia.
+            </p>
+            <div class="bg-white rounded-lg p-4 mb-3">
+                <p class="text-sm font-semibold text-gray-800 mb-2">¿Por qué ocurre esto?</p>
+                <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+                    <li><strong>Desbalanceo de clases:</strong> Distribución desigual entre categorías de anemia</li>
+                    <li><strong>Solapamiento de clases:</strong> Valores de hemoglobina cercanos a los umbrales de clasificación</li>
+                    <li><strong>Variables limitadas:</strong> Falta de información complementaria (ferritina, estado nutricional)</li>
+                </ul>
+            </div>
+            <div class="bg-white rounded-lg p-4">
+                <p class="text-sm font-semibold text-gray-800 mb-2">Sugerencias de mejora:</p>
+                <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+                    <li>Aplicar <strong>técnicas de balanceo</strong> (SMOTE para multiclase)</li>
+                    <li>Incluir más variables clínicas (edad gestacional detallada, IMC, antecedentes)</li>
+                    <li>Considerar <strong>modelos ensemble</strong> (Random Forest, Gradient Boosting)</li>
+                    <li>Ajustar umbrales de clasificación según importancia clínica</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Métricas Principales de Clasificación Multiclase -->
+<div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+    <h3 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-chart-bar mr-3 text-rose-500"></i>
+        Métricas de Rendimiento del Modelo de Clasificación
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Accuracy -->
+        {% if perfil.metricas.Accuracy %}
+        <div class="border-2 {% if perfil.metricas.Accuracy < 0.6 %}border-yellow-300 bg-yellow-50{% else %}border-gray-100{% endif %} rounded-xl p-4 hover:border-rose-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="text-sm font-semibold text-gray-600 uppercase">Accuracy</h4>
+                <i class="fas fa-bullseye text-rose-500"></i>
+            </div>
+            <p class="text-3xl font-bold {% if perfil.metricas.Accuracy < 0.6 %}text-yellow-700{% else %}text-gray-800{% endif %} mb-2">
+                {{ perfil.metricas.Accuracy|floatformat:4 }}
+            </p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+                {% widthratio perfil.metricas.Accuracy 1 100 as acc_percent %}
+                <div class="bg-gradient-to-r from-rose-400 to-rose-600 h-2 rounded-full" style="width: {{ acc_percent }}%"></div>
+            </div>
+            <p class="text-xs text-gray-600">Clasifica correctamente {{ acc_percent }}% de las gestantes</p>
+        </div>
+        {% endif %}
+
+        <!-- Precision (Macro) -->
+        {% if perfil.metricas.Precision %}
+        <div class="border-2 border-gray-100 rounded-xl p-4 hover:border-green-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="text-sm font-semibold text-gray-600 uppercase">Precision</h4>
+                <i class="fas fa-crosshairs text-green-500"></i>
+            </div>
+            <p class="text-3xl font-bold text-gray-800 mb-2">{{ perfil.metricas.Precision|floatformat:4 }}</p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+                {% widthratio perfil.metricas.Precision 1 100 as prec_percent %}
+                <div class="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full" style="width: {{ prec_percent }}%"></div>
+            </div>
+            <p class="text-xs text-gray-600">Precisión promedio entre clases (macro)</p>
+        </div>
+        {% endif %}
+
+        <!-- Recall (Macro) -->
+        {% if perfil.metricas.Recall %}
+        <div class="border-2 border-gray-100 rounded-xl p-4 hover:border-orange-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="text-sm font-semibold text-gray-600 uppercase">Recall</h4>
+                <i class="fas fa-search text-orange-500"></i>
+            </div>
+            <p class="text-3xl font-bold text-gray-800 mb-2">{{ perfil.metricas.Recall|floatformat:4 }}</p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+                {% widthratio perfil.metricas.Recall 1 100 as recall_percent %}
+                <div class="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full" style="width: {{ recall_percent }}%"></div>
+            </div>
+            <p class="text-xs text-gray-600">Sensibilidad promedio entre clases (macro)</p>
+        </div>
+        {% endif %}
+
+        <!-- F1-Score (Macro) -->
+        {% if perfil.metricas.F1_Score %}
+        <div class="border-2 border-gray-100 rounded-xl p-4 hover:border-purple-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="text-sm font-semibold text-gray-600 uppercase">F1-Score</h4>
+                <i class="fas fa-balance-scale text-purple-500"></i>
+            </div>
+            <p class="text-3xl font-bold text-gray-800 mb-2">{{ perfil.metricas.F1_Score|floatformat:4 }}</p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+                {% widthratio perfil.metricas.F1_Score 1 100 as f1_percent %}
+                <div class="bg-gradient-to-r from-purple-400 to-purple-600 h-2 rounded-full" style="width: {{ f1_percent }}%"></div>
+            </div>
+            <p class="text-xs text-gray-600">Balance entre precisión y recall (macro)</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Explicación contextual para anemia en gestantes -->
+    <div class="mt-6 bg-rose-50 border-l-4 border-rose-500 rounded-lg p-4">
+        <p class="text-sm text-rose-900 mb-3">
+            <i class="fas fa-info-circle mr-2"></i>
+            <strong>Interpretación Integrada para Anemia en Gestantes:</strong>
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-3">
+            <div class="bg-white rounded-lg p-3">
+                <p class="text-xs font-semibold text-gray-800 mb-1">Precisión General (Accuracy)</p>
+                {% if perfil.metricas.Accuracy %}
+                    {% widthratio perfil.metricas.Accuracy 1 100 as acc_pct %}
+                    <p class="text-xs text-gray-700">
+                        El modelo clasifica correctamente el <strong>{{ acc_pct }}%</strong> de las gestantes.
+                        {% if perfil.metricas.Accuracy >= 0.9 %}
+                            Rendimiento <strong class="text-green-600">Excelente</strong> para uso clínico.
+                        {% elif perfil.metricas.Accuracy >= 0.8 %}
+                            Rendimiento <strong class="text-blue-600">Muy bueno</strong> para detección de anemia.
+                        {% elif perfil.metricas.Accuracy >= 0.7 %}
+                            Rendimiento <strong class="text-blue-600">Aceptable</strong>. Útil como herramienta de apoyo.
+                        {% else %}
+                            Rendimiento <strong class="text-yellow-600">Limitado</strong>. Requiere mejoras.
+                        {% endif %}
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="bg-white rounded-lg p-3">
+                <p class="text-xs font-semibold text-gray-800 mb-1">Balance del Modelo (F1-Score)</p>
+                {% if perfil.metricas.F1_Score_Weighted %}
+                    {% widthratio perfil.metricas.F1_Score_Weighted 1 100 as f1_pct %}
+                    <p class="text-xs text-gray-700">
+                        F1-Score: <strong>{{ f1_pct }}%</strong> - equilibrio entre precisión y sensibilidad.
+                        {% if perfil.metricas.F1_Score_Weighted >= 0.9 %}
+                            <strong class="text-green-600">Excelente balance</strong> entre detectar correctamente y evitar falsos positivos.
+                        {% elif perfil.metricas.F1_Score_Weighted >= 0.8 %}
+                            <strong class="text-blue-600">Buen balance</strong> para clasificación clínica.
+                        {% else %}
+                            Balance <strong class="text-yellow-600">mejorable</strong>.
+                        {% endif %}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-3 mt-3">
+            <p class="text-xs font-semibold text-gray-800 mb-2">
+                <i class="fas fa-heartbeat text-rose-500 mr-1"></i>Importancia en Salud Pública:
+            </p>
+            <p class="text-xs text-gray-700">
+                En salud materno-infantil, es <strong>crítico detectar anemia moderada y severa</strong> para prevenir complicaciones en el embarazo y parto. Con un accuracy de {{ acc_pct }}%, este modelo puede servir como <strong>herramienta de screening</strong> para priorizar atención médica en gestantes de alto riesgo en Puno.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Matriz de Confusión Multiclase (4x4) -->
+{% if perfil.metricas.Confusion_Matrix %}
+<div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+    <h3 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-table mr-3 text-rose-500"></i>
+        Matriz de Confusión - Clasificación de Anemia (4 Clases)
+    </h3>
+
+    {% with cm=perfil.metricas.Confusion_Matrix %}
+    <!-- Nota: La matriz de confusión debe ser 4x4 para las 4 clases -->
+    <!-- Asumiendo orden: Normal, Leve, Moderada, Severa -->
+
+    <div class="overflow-x-auto mb-6">
+        <table class="w-full border-collapse text-sm">
+            <thead>
+                <tr>
+                    <th class="border-2 border-gray-300 bg-gray-100 p-3" rowspan="2" colspan="2">
+                        <div class="text-center text-gray-600 font-bold text-xs">MATRIZ 4x4</div>
+                    </th>
+                    <th class="border-2 border-gray-300 bg-rose-100 p-2 text-center font-bold text-rose-900" colspan="4">
+                        <i class="fas fa-robot mr-1"></i>PREDICCIÓN DEL MODELO
+                    </th>
+                </tr>
+                <tr>
+                    <th class="border-2 border-gray-300 bg-green-50 p-2 text-center font-semibold text-green-900 text-xs">
+                        Normal
+                    </th>
+                    <th class="border-2 border-gray-300 bg-yellow-50 p-2 text-center font-semibold text-yellow-900 text-xs">
+                        Leve
+                    </th>
+                    <th class="border-2 border-gray-300 bg-orange-50 p-2 text-center font-semibold text-orange-900 text-xs">
+                        Moderada
+                    </th>
+                    <th class="border-2 border-gray-300 bg-red-50 p-2 text-center font-semibold text-red-900 text-xs">
+                        Severa
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Fila 1: Normal -->
+                <tr>
+                    <td class="border-2 border-gray-300 bg-rose-100 p-2 text-center font-bold text-rose-900 align-middle" rowspan="4">
+                        <div class="transform -rotate-180" style="writing-mode: vertical-lr; font-size: 11px;">
+                            <i class="fas fa-clipboard-check"></i> REALIDAD
+                        </div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-green-50 p-2 text-center font-semibold text-green-900 text-xs">
+                        Normal
+                    </td>
+                    <td class="border-2 border-gray-300 bg-green-100 p-3 text-center">
+                        <div class="text-2xl font-bold text-green-700">{{ cm.0.0|default:"--" }}</div>
+                        <div class="text-xs text-green-600 mt-1">Correcto</div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-gray-50 p-3 text-center">
+                        <div class="text-xl font-bold text-gray-600">{{ cm.0.1|default:"--" }}</div>
+                        <div class="text-xs text-gray-500 mt-1">Error</div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-gray-50 p-3 text-center">
+                        <div class="text-xl font-bold text-gray-600">{{ cm.0.2|default:"--" }}</div>
+                        <div class="text-xs text-gray-500 mt-1">Error</div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-gray-50 p-3 text-center">
+                        <div class="text-xl font-bold text-gray-600">{{ cm.0.3|default:"--" }}</div>
+                        <div class="text-xs text-gray-500 mt-1">Error</div>
+                    </td>
+                </tr>
+
+                <!-- Fila 2: Leve -->
+                <tr>
+                    <td class="border-2 border-gray-300 bg-yellow-50 p-2 text-center font-semibold text-yellow-900 text-xs">
+                        Leve
+                    </td>
+                    <td class="border-2 border-gray-300 bg-gray-50 p-3 text-center">
+                        <div class="text-xl font-bold text-gray-600">{{ cm.1.0|default:"--" }}</div>
+                        <div class="text-xs text-gray-500 mt-1">Error</div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-yellow-100 p-3 text-center">
+                        <div class="text-2xl font-bold text-yellow-700">{{ cm.1.1|default:"--" }}</div>
+                        <div class="text-xs text-yellow-600 mt-1">Correcto</div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-gray-50 p-3 text-center">
+                        <div class="text-xl font-bold text-gray-600">{{ cm.1.2|default:"--" }}</div>
+                        <div class="text-xs text-gray-500 mt-1">Error</div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-gray-50 p-3 text-center">
+                        <div class="text-xl font-bold text-gray-600">{{ cm.1.3|default:"--" }}</div>
+                        <div class="text-xs text-gray-500 mt-1">Error</div>
+                    </td>
+                </tr>
+
+                <!-- Fila 3: Moderada -->
+                <tr>
+                    <td class="border-2 border-gray-300 bg-orange-50 p-2 text-center font-semibold text-orange-900 text-xs">
+                        Moderada
+                    </td>
+                    <td class="border-2 border-gray-300 bg-gray-50 p-3 text-center">
+                        <div class="text-xl font-bold text-gray-600">{{ cm.2.0|default:"--" }}</div>
+                        <div class="text-xs text-gray-500 mt-1">Error</div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-gray-50 p-3 text-center">
+                        <div class="text-xl font-bold text-gray-600">{{ cm.2.1|default:"--" }}</div>
+                        <div class="text-xs text-gray-500 mt-1">Error</div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-orange-100 p-3 text-center">
+                        <div class="text-2xl font-bold text-orange-700">{{ cm.2.2|default:"--" }}</div>
+                        <div class="text-xs text-orange-600 mt-1">Correcto</div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-gray-50 p-3 text-center">
+                        <div class="text-xl font-bold text-gray-600">{{ cm.2.3|default:"--" }}</div>
+                        <div class="text-xs text-gray-500 mt-1">Error</div>
+                    </td>
+                </tr>
+
+                <!-- Fila 4: Severa -->
+                <tr>
+                    <td class="border-2 border-gray-300 bg-red-50 p-2 text-center font-semibold text-red-900 text-xs">
+                        Severa
+                    </td>
+                    <td class="border-2 border-gray-300 bg-gray-50 p-3 text-center">
+                        <div class="text-xl font-bold text-gray-600">{{ cm.3.0|default:"--" }}</div>
+                        <div class="text-xs text-gray-500 mt-1">Error</div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-gray-50 p-3 text-center">
+                        <div class="text-xl font-bold text-gray-600">{{ cm.3.1|default:"--" }}</div>
+                        <div class="text-xs text-gray-500 mt-1">Error</div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-gray-50 p-3 text-center">
+                        <div class="text-xl font-bold text-gray-600">{{ cm.3.2|default:"--" }}</div>
+                        <div class="text-xs text-gray-500 mt-1">Error</div>
+                    </td>
+                    <td class="border-2 border-gray-300 bg-red-100 p-3 text-center">
+                        <div class="text-2xl font-bold text-red-700">{{ cm.3.3|default:"--" }}</div>
+                        <div class="text-xs text-red-600 mt-1">Correcto</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Análisis Detallado de la Matriz de Confusión -->
+    <div class="bg-indigo-50 border-l-4 border-indigo-500 rounded-lg p-4 mb-4">
+        <h4 class="font-bold text-indigo-800 mb-3 flex items-center">
+            <i class="fas fa-calculator mr-2"></i>Análisis Detallado de la Matriz (De {{ perfil.metricas.Test_Size }} gestantes)
+        </h4>
+
+        <div class="grid md:grid-cols-4 gap-2 text-xs">
+            <!-- Normal -->
+            <div class="bg-white rounded p-2 border-l-2 border-green-500">
+                <p class="font-semibold text-green-800">Normal</p>
+                <p class="text-gray-700">Correctos: <strong class="text-green-600">{{ cm.0.0 }}</strong></p>
+                <p class="text-gray-700">Errores: <strong class="text-red-600">{{ cm.0.1|add:cm.0.2|add:cm.0.3 }}</strong></p>
+                {% widthratio cm.0.0 cm.0.0|add:cm.0.1|add:cm.0.2|add:cm.0.3 100 as normal_acc %}
+                <p class="text-gray-600 mt-1">Accuracy: {{ normal_acc }}%</p>
+            </div>
+
+            <!-- Leve -->
+            <div class="bg-white rounded p-2 border-l-2 border-yellow-500">
+                <p class="font-semibold text-yellow-800">Anemia Leve</p>
+                <p class="text-gray-700">Correctos: <strong class="text-green-600">{{ cm.1.1 }}</strong></p>
+                <p class="text-gray-700">Errores: <strong class="text-red-600">{{ cm.1.0|add:cm.1.2|add:cm.1.3 }}</strong></p>
+                {% widthratio cm.1.1 cm.1.0|add:cm.1.1|add:cm.1.2|add:cm.1.3 100 as leve_acc %}
+                <p class="text-gray-600 mt-1">Accuracy: {{ leve_acc }}%</p>
+            </div>
+
+            <!-- Moderada -->
+            <div class="bg-white rounded p-2 border-l-2 border-orange-500">
+                <p class="font-semibold text-orange-800">Anemia Moderada</p>
+                <p class="text-gray-700">Correctos: <strong class="text-green-600">{{ cm.2.2 }}</strong></p>
+                <p class="text-gray-700">Errores: <strong class="text-red-600">{{ cm.2.0|add:cm.2.1|add:cm.2.3 }}</strong></p>
+                {% widthratio cm.2.2 cm.2.0|add:cm.2.1|add:cm.2.2|add:cm.2.3 100 as mod_acc %}
+                <p class="text-gray-600 mt-1">Accuracy: {{ mod_acc }}%</p>
+            </div>
+
+            <!-- Severa -->
+            <div class="bg-white rounded p-2 border-l-2 border-red-500">
+                <p class="font-semibold text-red-800">Anemia Severa</p>
+                <p class="text-gray-700">Correctos: <strong class="text-green-600">{{ cm.3.3 }}</strong></p>
+                <p class="text-gray-700">Errores: <strong class="text-red-600">{{ cm.3.0|add:cm.3.1|add:cm.3.2 }}</strong></p>
+                {% widthratio cm.3.3 cm.3.0|add:cm.3.1|add:cm.3.2|add:cm.3.3 100 as sev_acc %}
+                <p class="text-gray-600 mt-1">Accuracy: {{ sev_acc }}%</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interpretación para anemia en gestantes -->
+    <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4">
+            <h4 class="font-bold text-green-800 mb-2 flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>Rendimiento por Clase
+            </h4>
+            <div class="space-y-1 text-xs text-green-900">
+                <p><strong>Normal:</strong> {{ cm.0.0 }}/{{ cm.0.0|add:cm.0.1|add:cm.0.2|add:cm.0.3 }} correctas ({{ normal_acc }}%)</p>
+                <p><strong>Leve:</strong> {{ cm.1.1 }}/{{ cm.1.0|add:cm.1.1|add:cm.1.2|add:cm.1.3 }} correctas ({{ leve_acc }}%)</p>
+                <p><strong>Moderada:</strong> {{ cm.2.2 }}/{{ cm.2.0|add:cm.2.1|add:cm.2.2|add:cm.2.3 }} correctas ({{ mod_acc }}%)</p>
+                <p><strong>Severa:</strong> {{ cm.3.3 }}/{{ cm.3.0|add:cm.3.1|add:cm.3.2|add:cm.3.3 }} correctas ({{ sev_acc }}%)</p>
+                <p class="text-green-700 font-semibold mt-2 pt-2 border-t border-green-200">
+                    Total correctas: {{ cm.0.0|add:cm.1.1|add:cm.2.2|add:cm.3.3 }}/{{ perfil.metricas.Test_Size }}
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-4">
+            <h4 class="font-bold text-yellow-800 mb-2 flex items-center">
+                <i class="fas fa-exclamation-triangle mr-2"></i>Errores Críticos Detectados
+            </h4>
+            <div class="space-y-2 text-xs text-yellow-900">
+                {% if cm.3.0|add:cm.3.1 > 0 %}
+                    <p class="text-red-700"><strong>⚠️ CRÍTICO:</strong> {{ cm.3.0|add:cm.3.1 }} casos de anemia severa clasificados como normal/leve</p>
+                {% else %}
+                    <p class="text-green-700"><strong>✓</strong> No hay errores críticos en anemia severa</p>
+                {% endif %}
+
+                {% if cm.2.0 > 0 %}
+                    <p class="text-orange-700"><strong>Importante:</strong> {{ cm.2.0 }} casos de anemia moderada clasificados como normal</p>
+                {% else %}
+                    <p class="text-green-700"><strong>✓</strong> No hay confusión moderada-normal</p>
+                {% endif %}
+
+                <p class="text-gray-700 mt-2 pt-2 border-yellow-200">
+                    <strong>Errores totales:</strong> Los casos mal clasificados requieren seguimiento especial
+                </p>
+
+                <p class="text-yellow-700 font-semibold mt-2">
+                    Las gestantes con anemia moderada/severa requieren atención médica inmediata
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Impacto en salud pública -->
+    <div class="mt-4 bg-rose-50 border-l-4 border-rose-500 rounded-lg p-4">
+        <p class="text-sm text-rose-900">
+            <i class="fas fa-heartbeat mr-2"></i>
+            <strong>Impacto en Salud Pública de Puno:</strong>
+            El modelo logra detectar <strong>{{ cm.2.2|add:cm.3.3 }} de {{ cm.2.0|add:cm.2.1|add:cm.2.2|add:cm.2.3|add:cm.3.0|add:cm.3.1|add:cm.3.2|add:cm.3.3 }} gestantes</strong> con anemia moderada/severa. Esto permite priorizar recursos de salud y garantizar suplementación con hierro y seguimiento médico oportuno para prevenir complicaciones perinatales.
+        </p>
+    </div>
+    {% endwith %}
+</div>
+{% endif %}
+
+<!-- Métricas por Clase (si existen) -->
+{% if perfil.metricas.Class_Metrics %}
+<div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+    <h3 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-list-alt mr-3 text-purple-500"></i>
+        Métricas de Rendimiento por Clase
+    </h3>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="border p-3 text-left">Clase</th>
+                    <th class="border p-3 text-center">Precision</th>
+                    <th class="border p-3 text-center">Recall</th>
+                    <th class="border p-3 text-center">F1-Score</th>
+                    <th class="border p-3 text-center">Support</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for class_name, metrics in perfil.metricas.Class_Metrics.items %}
+                <tr class="hover:bg-gray-50">
+                    <td class="border p-3 font-semibold">{{ class_name }}</td>
+                    <td class="border p-3 text-center">{{ metrics.precision|floatformat:4 }}</td>
+                    <td class="border p-3 text-center">{{ metrics.recall|floatformat:4 }}</td>
+                    <td class="border p-3 text-center">{{ metrics.f1_score|floatformat:4 }}</td>
+                    <td class="border p-3 text-center">{{ metrics.support }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- Validación Cruzada -->
+{% if perfil.metricas.CV_Mean_Score %}
+<div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+    <h3 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-chart-line mr-3 text-purple-500"></i>
+        Validación Cruzada (5-Fold) - Consistencia del Modelo
+    </h3>
+
+    <div class="grid md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-purple-50 border-2 border-purple-200 rounded-xl p-6 text-center">
+            <div class="text-4xl font-bold text-purple-600 mb-2">
+                {{ perfil.metricas.CV_Mean_Score|floatformat:4 }}
+            </div>
+            <div class="text-sm text-purple-900 font-semibold">Accuracy Promedio (5 folds)</div>
+            <div class="text-xs text-gray-600 mt-2">Rendimiento consistente del modelo</div>
+        </div>
+
+        <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center">
+            <div class="text-4xl font-bold text-blue-600 mb-2">
+                ± {{ perfil.metricas.CV_Std_Score|floatformat:4 }}
+            </div>
+            <div class="text-sm text-blue-900 font-semibold">Desviación Estándar</div>
+            <div class="text-xs text-gray-600 mt-2">Variabilidad entre folds</div>
+        </div>
+
+        <div class="bg-green-50 border-2 border-green-200 rounded-xl p-6 text-center">
+            <div class="text-4xl font-bold text-green-600 mb-2">
+                {{ perfil.metricas.Best_CV_Score|floatformat:4 }}
+            </div>
+            <div class="text-sm text-green-900 font-semibold">Mejor Accuracy (ajustado)</div>
+            <div class="text-xs text-gray-600 mt-2">Con hiperparámetros óptimos</div>
+        </div>
+    </div>
+
+    <div class="bg-rose-50 border-l-4 border-rose-500 rounded-lg p-4">
+        <h4 class="font-bold text-rose-800 mb-3 flex items-center">
+            <i class="fas fa-info-circle mr-2"></i>¿Qué significa la Validación Cruzada?
+        </h4>
+        <div class="space-y-2 text-sm text-rose-900">
+            <p>El dataset se dividió en <strong>5 partes (folds)</strong></p>
+            <p>El modelo se entrenó <strong>5 veces</strong>, cada vez usando 4 partes para entrenar y 1 para validar</p>
+            {% widthratio perfil.metricas.CV_Mean_Score 1 100 as cv_acc_pct %}
+            <p>Accuracy promedio: <strong>{{ cv_acc_pct }}%</strong> - el modelo clasifica correctamente en promedio {{ cv_acc_pct }}% de los casos</p>
+            <p>Desviación estándar: <strong>{{ perfil.metricas.CV_Std_Score|floatformat:4 }}</strong> - indica {% if perfil.metricas.CV_Std_Score < 0.01 %}muy poca{% elif perfil.metricas.CV_Std_Score < 0.02 %}poca{% else %}algo de{% endif %} variabilidad</p>
+
+            <div class="bg-white rounded-lg p-3 mt-3">
+                <p class="text-xs font-semibold text-gray-800 mb-2">¿Por qué es importante?</p>
+                <p class="text-xs text-gray-700">
+                    La validación cruzada asegura que el modelo no solo memoriza los datos de entrenamiento,
+                    sino que realmente <strong>generaliza bien</strong> a nuevas gestantes.
+                    {% if perfil.metricas.CV_Std_Score < 0.01 %}
+                        Tu modelo muestra <strong>excelente consistencia</strong> (desviación muy baja).
+                    {% elif perfil.metricas.CV_Std_Score < 0.02 %}
+                        Tu modelo muestra <strong>buena consistencia</strong> entre diferentes conjuntos de datos.
+                    {% else %}
+                        Tu modelo tiene algo de variabilidad. Considera validar con más datos.
+                    {% endif %}
+                    Con una desviación de solo {{ perfil.metricas.CV_Std_Score|floatformat:4 }}, el modelo es <strong>muy confiable</strong> para clasificar gestantes en diferentes contextos.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<!-- No Results State -->
+<div class="bg-white rounded-2xl p-12 shadow-lg text-center">
+    <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <i class="fas fa-chart-line text-4xl text-gray-400"></i>
+    </div>
+    <h3 class="text-2xl font-bold text-gray-800 mb-4">No hay resultados disponibles</h3>
+    <p class="text-gray-600 mb-8 max-w-md mx-auto">
+        Para ver métricas y visualizaciones, primero necesitas entrenar tu modelo con un dataset.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        {% if not perfil.dataset_nombre %}
+            <a href="{% url 'dashboard_datos' perfil.id %}" class="bg-rose-500 text-white px-6 py-3 rounded-lg hover:bg-rose-600 transition-colors">
+                <i class="fas fa-upload mr-2"></i>Subir Dataset
+            </a>
+        {% endif %}
+
+        {% if perfil.dataset_nombre and not perfil.algoritmo_elegido %}
+            <a href="{% url 'dashboard_modelo' perfil.id %}" class="bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-colors">
+                <i class="fas fa-robot mr-2"></i>Configurar Modelo
+            </a>
+        {% endif %}
+
+        {% if perfil.dataset_nombre and perfil.algoritmo_elegido %}
+            <a href="{% url 'dashboard_modelo' perfil.id %}" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors">
+                <i class="fas fa-play mr-2"></i>Entrenar Modelo
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Export and Actions -->
+<div class="bg-white rounded-2xl p-6 shadow-lg">
+    <h3 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-download mr-3 text-indigo-500"></i>
+        Exportar Resultados
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-rose-500 hover:bg-rose-50 transition-all group">
+            <div class="text-center">
+                <i class="fas fa-file-pdf text-2xl text-gray-400 group-hover:text-rose-500 mb-2"></i>
+                <p class="font-medium text-gray-600 group-hover:text-rose-700">Reporte PDF</p>
+            </div>
+        </button>
+
+        <button class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all group">
+            <div class="text-center">
+                <i class="fas fa-file-excel text-2xl text-gray-400 group-hover:text-green-500 mb-2"></i>
+                <p class="font-medium text-gray-600 group-hover:text-green-700">Datos Excel</p>
+            </div>
+        </button>
+
+        <button class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all group">
+            <div class="text-center">
+                <i class="fas fa-code text-2xl text-gray-400 group-hover:text-purple-500 mb-2"></i>
+                <p class="font-medium text-gray-600 group-hover:text-purple-700">Código Python</p>
+            </div>
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if perfil.metricas %}
+    // Chart.js configurations para clasificación multiclase pueden ir aquí
+    // (si se necesitan gráficos adicionales como ROC multiclase, etc.)
+    {% endif %}
+
+    // Export functionality
+    document.querySelectorAll('button[class*="group"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const text = this.querySelector('p').textContent;
+            console.log(`Exportando: ${text}`);
+            // Implement export logic here
+        });
+    });
+});
+</script>
+{% endblock %}

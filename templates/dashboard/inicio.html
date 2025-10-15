@@ -53,17 +53,39 @@
             <p class="text-gray-600 text-sm">Algoritmo de aprendizaje supervisado que modela la relación lineal entre variables independientes y la variable dependiente.</p>
         </div>
 
-        <!-- Regresión Logística -->
-        <div class="algorithm-card bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-green-500"
+        <!-- Regresión Logística - PROYECTO ACTIVO -->
+        <div class="algorithm-card bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-green-600 relative"
              onclick="openAlgorithmModal('regresion_logistica')">
-            <div class="flex items-center justify-between mb-3">
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-percentage text-green-600 text-xl"></i>
-                </div>
-                <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            <!-- Badge del Proyecto -->
+            <div class="absolute top-3 right-3">
+                <span class="bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                    PROYECTO ACTIVO
+                </span>
             </div>
-            <h3 class="text-lg font-bold text-gray-800 mb-2">Regresión Logística</h3>
-            <p class="text-gray-600 text-sm">Algoritmo de clasificación que utiliza la función logística para modelar la probabilidad de pertenencia a clases.</p>
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center shadow-lg">
+                    <i class="fas fa-chart-pie text-white text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-green-600 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2 flex items-center">
+                Regresión Logística
+                <i class="fas fa-star text-yellow-500 ml-2 text-sm"></i>
+            </h3>
+            <p class="text-gray-700 text-sm font-medium mb-3">Algoritmo de clasificación que utiliza la función logística para modelar probabilidades de pertenencia a clases.</p>
+
+            <!-- Info del Proyecto -->
+            <div class="bg-white/70 rounded-lg p-3 border border-green-200 mt-3">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-project-diagram text-green-600 mr-2"></i>
+                    <span class="text-xs font-bold text-green-800">PROYECTO PARCIAL</span>
+                </div>
+                <p class="text-xs text-gray-700 leading-relaxed">
+                    <strong>Predicción de Pobreza Monetaria en Puno</strong><br>
+                    Dataset: 1,200 familias | 13 variables<br>
+                    Región con 39.9% de pobreza (INEI 2024)
+                </p>
+            </div>
         </div>
 
         <!-- Ridge y Lasso -->
@@ -250,11 +272,16 @@ mse = mean_squared_error(y_test, y_pred)</code></pre>
                 content: `
                     <div class="p-8">
                         <div class="flex items-center mb-6">
-                            <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                                <i class="fas fa-percentage text-green-600 text-2xl"></i>
+                            <div class="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center mr-4 shadow-lg">
+                                <i class="fas fa-chart-pie text-white text-2xl"></i>
                             </div>
-                            <div>
-                                <h2 class="text-3xl font-bold text-gray-800">Regresión Logística</h2>
+                            <div class="flex-1">
+                                <div class="flex items-center">
+                                    <h2 class="text-3xl font-bold text-gray-800">Regresión Logística</h2>
+                                    <span class="ml-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                                        PROYECTO ACTIVO
+                                    </span>
+                                </div>
                                 <p class="text-gray-600">Clasificación binaria/multiclase</p>
                             </div>
                             <button onclick="closeAlgorithmModal()" class="ml-auto text-gray-400 hover:text-gray-600 text-2xl">
@@ -262,7 +289,75 @@ mse = mean_squared_error(y_test, y_pred)</code></pre>
                             </button>
                         </div>
 
+                        <!-- PROYECTO PARCIAL - Info destacada -->
+                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-6 border-l-4 border-green-600 shadow-md">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-project-diagram text-green-600 text-2xl mr-3"></i>
+                                <h3 class="text-xl font-bold text-green-800">PROYECTO PARCIAL - Aprendizaje Supervisado</h3>
+                            </div>
+                            <h4 class="text-lg font-bold text-gray-800 mb-3">Predicción de Riesgo de Pobreza Monetaria en Puno</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div class="bg-white rounded-lg p-3 shadow-sm">
+                                    <div class="text-2xl font-bold text-green-600">1,200</div>
+                                    <div class="text-xs text-gray-600">Familias en dataset</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 shadow-sm">
+                                    <div class="text-2xl font-bold text-green-600">13</div>
+                                    <div class="text-xs text-gray-600">Variables predictoras</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 shadow-sm">
+                                    <div class="text-2xl font-bold text-green-600">39.9%</div>
+                                    <div class="text-xs text-gray-600">Pobreza en Puno (INEI 2024)</div>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-700 space-y-1">
+                                <p><strong>Problema:</strong> Clasificación binaria (Pobre / No Pobre)</p>
+                                <p><strong>Variable objetivo:</strong> Ingreso mensual ≤ S/454 (línea de pobreza)</p>
+                                <p><strong>Variables:</strong> Ingreso, educación, empleo, servicios básicos, ubicación, sector laboral, etc.</p>
+                                <p><strong>Técnicas:</strong> Validación cruzada (5-fold) + GridSearchCV para hiperparámetros</p>
+                            </div>
+                        </div>
+
                         <div class="space-y-6">
+                            <!-- JUSTIFICACIÓN PARA EL PROYECTO DE PUNO -->
+                            <div class="bg-blue-50 rounded-lg p-5 border border-blue-200">
+                                <h3 class="text-xl font-bold text-blue-800 mb-4 flex items-center">
+                                    <i class="fas fa-lightbulb mr-2"></i>¿Por qué Regresión Logística para este Proyecto?
+                                </h3>
+                                <div class="space-y-3 text-sm text-gray-700">
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
+                                        <div>
+                                            <strong>Interpretabilidad:</strong> Los coeficientes muestran cómo cada factor (educación, empleo, ingresos) afecta el riesgo de pobreza. Esto es crucial para políticas públicas.
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
+                                        <div>
+                                            <strong>Probabilidades calibradas:</strong> Permite calcular P(familia en pobreza) y priorizar intervenciones según riesgo.
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
+                                        <div>
+                                            <strong>Eficiencia computacional:</strong> Entrena rápido con 1,200 familias. Ideal para sistemas en producción con recursos limitados.
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
+                                        <div>
+                                            <strong>Robustez:</strong> Funciona bien con variables mixtas (numéricas y categóricas) como las del dataset de Puno.
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
+                                        <div>
+                                            <strong>Validación científica:</strong> Ampliamente usado en estudios socioeconómicos sobre pobreza (INEI, Banco Mundial).
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div>
                                 <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
                                     <i class="fas fa-info-circle mr-2 text-green-600"></i>Definición
@@ -321,24 +416,65 @@ mse = mean_squared_error(y_test, y_pred)</code></pre>
                                 </div>
                             </div>
 
+                            <!-- RESULTADOS DEL PROYECTO PUNO -->
+                            <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-5 border-l-4 border-purple-600">
+                                <h3 class="text-xl font-bold text-purple-800 mb-4 flex items-center">
+                                    <i class="fas fa-chart-bar mr-2"></i>Resultados Esperados del Proyecto
+                                </h3>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                                    <div class="bg-white rounded-lg p-3 text-center shadow-sm">
+                                        <div class="text-2xl font-bold text-purple-600">&gt;85%</div>
+                                        <div class="text-xs text-gray-600">Accuracy</div>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-3 text-center shadow-sm">
+                                        <div class="text-2xl font-bold text-purple-600">&gt;85%</div>
+                                        <div class="text-xs text-gray-600">Recall (sensibilidad)</div>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-3 text-center shadow-sm">
+                                        <div class="text-2xl font-bold text-purple-600">&gt;80%</div>
+                                        <div class="text-xs text-gray-600">F1-Score</div>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-3 text-center shadow-sm">
+                                        <div class="text-2xl font-bold text-purple-600">&gt;0.90</div>
+                                        <div class="text-xs text-gray-600">ROC-AUC</div>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-700 mb-2">
+                                    <strong>Interpretación de coeficientes:</strong>
+                                </p>
+                                <ul class="text-xs text-gray-700 space-y-1">
+                                    <li>• <strong>Ingreso mensual:</strong> Factor más importante (coef. negativo alto)</li>
+                                    <li>• <strong>Empleo informal:</strong> Aumenta significativamente el riesgo (+)</li>
+                                    <li>• <strong>Educación superior:</strong> Factor protector (-)</li>
+                                    <li>• <strong>Programas sociales:</strong> Reducen el riesgo (-)</li>
+                                </ul>
+                            </div>
+
                             <div>
                                 <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                                    <i class="fas fa-code mr-2 text-green-600"></i>Implementación
+                                    <i class="fas fa-code mr-2 text-green-600"></i>Implementación en el Proyecto
                                 </h3>
                                 <div class="bg-gray-900 text-gray-100 p-4 rounded-lg">
-                                    <pre class="text-sm"><code>from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
+                                    <pre class="text-sm"><code>from apps.ml_models import MLPipeline
 
-# Crear y entrenar el modelo
-model = LogisticRegression()
-model.fit(X_train, y_train)
+# Crear pipeline con POO
+pipeline = MLPipeline(
+    algorithm='regresion_logistica',
+    problem_type='classification'
+)
 
-# Realizar predicciones
-y_pred = model.predict(X_test)
-y_proba = model.predict_proba(X_test)
+# Ejecutar pipeline completo
+results = pipeline.run_complete_pipeline(
+    file_path='dataset_pobreza_puno.csv',
+    test_size=0.2,
+    use_cross_validation=True,      # 5-fold CV
+    hyperparameter_tuning=True,      # GridSearchCV
+    engineer_features=False
+)
 
-# Evaluar el modelo
-accuracy = accuracy_score(y_test, y_pred)</code></pre>
+# Ver métricas
+print(f"Accuracy: {results['evaluation']['Accuracy']:.4f}")
+print(f"ROC-AUC: {results['evaluation']['ROC_AUC']:.4f}")</code></pre>
                                 </div>
                             </div>
                         </div>

@@ -1,0 +1,507 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block page_title %}Resultados{% endblock %}
+{% block page_subtitle %}Análisis y visualización de métricas del modelo{% endblock %}
+
+{% block content %}
+<!-- Model Performance Overview -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Main Performance Card -->
+    <div class="lg:col-span-2 bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-2xl p-8 relative overflow-hidden">
+        <div class="absolute top-0 right-0 opacity-20">
+            <i class="fas fa-graduation-cap text-8xl transform rotate-12"></i>
+        </div>
+        <div class="relative z-10">
+            <h2 class="text-3xl font-bold mb-4">Rendimiento del Modelo</h2>
+            <p class="text-white/90 text-lg mb-6">
+                {% if perfil.tiene_modelo_entrenado %}
+                    Tu modelo de {{ perfil.get_algoritmo_elegido_display }} ha sido entrenado exitosamente para predecir el rendimiento académico.
+                {% else %}
+                    Entrena tu modelo para ver los resultados aquí.
+                {% endif %}
+            </p>
+            {% if not perfil.tiene_modelo_entrenado %}
+                <a href="{% url 'dashboard_modelo' perfil.id %}" class="bg-white/20 text-white px-6 py-2 rounded-lg hover:bg-white/30 transition-colors">
+                    <i class="fas fa-play mr-2"></i>Entrenar Modelo
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Model Status -->
+    <div class="space-y-4">
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Estado del Modelo</p>
+                    <p class="text-lg font-semibold text-gray-800">
+                        {% if perfil.tiene_modelo_entrenado %}
+                            <span class="text-green-600">Entrenado</span>
+                        {% else %}
+                            <span class="text-orange-600">Pendiente</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="w-16 h-16 rounded-full flex items-center justify-center
+                    {% if perfil.tiene_modelo_entrenado %}bg-gradient-to-r from-green-400 to-green-500{% else %}bg-gradient-to-r from-orange-400 to-orange-500{% endif %}">
+                    <i class="fas {% if perfil.tiene_modelo_entrenado %}fa-check{% else %}fa-clock{% endif %} text-white text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Tiempo Entrenamiento</p>
+                    <p class="text-lg font-semibold text-gray-800">
+                        {{ perfil.tiempo_entrenamiento|default:"--:--" }}
+                    </p>
+                </div>
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-stopwatch text-white text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if perfil.metricas %}
+<!-- PROYECTO - Información destacada -->
+<div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-600 rounded-xl p-6 mb-8 shadow-lg">
+    <div class="flex items-center mb-4">
+        <i class="fas fa-graduation-cap text-blue-600 text-2xl mr-3"></i>
+        <h3 class="text-xl font-bold text-blue-800">PROYECTO - Predicción del Rendimiento Académico</h3>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mb-4">
+        <div class="bg-white rounded-lg p-4 border-l-4 border-blue-500">
+            <p class="text-sm text-gray-600 mb-2">Algoritmo utilizado:</p>
+            <p class="text-lg font-bold text-blue-900">{{ perfil.get_algoritmo_elegido_display }}</p>
+        </div>
+        <div class="bg-white rounded-lg p-4 border-l-4 border-purple-500">
+            <p class="text-sm text-gray-600 mb-2">Datos de entrenamiento:</p>
+            <p class="text-lg font-bold text-purple-900">{{ perfil.metricas.Train_Size|default:"--" }} estudiantes</p>
+        </div>
+        <div class="bg-white rounded-lg p-4 border-l-4 border-orange-500">
+            <p class="text-sm text-gray-600 mb-2">Datos de prueba:</p>
+            <p class="text-lg font-bold text-orange-900">{{ perfil.metricas.Test_Size|default:"--" }} estudiantes</p>
+        </div>
+    </div>
+
+    <!-- Validación Cruzada (si existe) -->
+    {% if perfil.metricas.CV_Mean_Score %}
+    <div class="bg-white rounded-lg p-4 mb-4">
+        <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+            <i class="fas fa-sync-alt text-blue-500 mr-2"></i>
+            Validación Cruzada (5-Fold CV)
+        </h4>
+        <div class="grid md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm text-gray-600">R² Promedio CV:</p>
+                <p class="text-2xl font-bold text-blue-600">{{ perfil.metricas.CV_Mean_Score|floatformat:4 }} ± {{ perfil.metricas.CV_Std_Score|floatformat:4 }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Mejor R² (Hiperparámetros):</p>
+                <p class="text-2xl font-bold text-green-600">{{ perfil.metricas.Best_CV_Score|floatformat:4 }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Advertencia sobre R² bajo -->
+{% if perfil.metricas.R2_Score and perfil.metricas.R2_Score < 0.5 %}
+<div class="bg-yellow-50 border-l-4 border-yellow-500 rounded-xl p-6 mb-8">
+    <div class="flex items-start">
+        <i class="fas fa-exclamation-triangle text-yellow-600 text-2xl mr-4 mt-1"></i>
+        <div>
+            <h3 class="text-lg font-bold text-yellow-800 mb-2">Advertencia: R² Bajo ({{ perfil.metricas.R2_Score|floatformat:4 }})</h3>
+            <p class="text-yellow-900 mb-3">
+                {% widthratio perfil.metricas.R2_Score 1 100 as r2_pct %}
+                El modelo explica solo el <strong>{{ r2_pct }}%</strong> de la variabilidad en las calificaciones finales.
+                Esto indica que hay otros factores importantes que no están siendo capturados por el modelo actual.
+            </p>
+            <div class="bg-white rounded-lg p-4 mb-3">
+                <p class="text-sm font-semibold text-gray-800 mb-2">¿Por qué ocurre esto?</p>
+                <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+                    <li><strong>Variables faltantes:</strong> Factores como motivación, calidad docente, o contexto socioeconómico</li>
+                    <li><strong>Relaciones no lineales:</strong> La relación entre variables puede no ser estrictamente lineal</li>
+                    <li><strong>Ruido en los datos:</strong> Variabilidad natural en el rendimiento estudiantil</li>
+                </ul>
+            </div>
+            <div class="bg-white rounded-lg p-4">
+                <p class="text-sm font-semibold text-gray-800 mb-2">Sugerencias de mejora:</p>
+                <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+                    <li>Incluir más variables explicativas (asistencia, participación, contexto familiar)</li>
+                    <li>Considerar <strong>modelos no lineales</strong> (Polynomial Regression, Random Forest)</li>
+                    <li>Realizar <strong>ingeniería de características</strong> (interacciones entre variables)</li>
+                    <li>Recopilar más datos y asegurar la calidad de los mismos</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Métricas Principales de Regresión -->
+<div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+    <h3 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-chart-bar mr-3 text-blue-500"></i>
+        Métricas de Rendimiento del Modelo de Regresión
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- R² Score -->
+        {% if perfil.metricas.R2_Score %}
+        <div class="border-2 {% if perfil.metricas.R2_Score < 0.5 %}border-yellow-300 bg-yellow-50{% else %}border-gray-100{% endif %} rounded-xl p-4 hover:border-blue-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="text-sm font-semibold text-gray-600 uppercase">R² Score</h4>
+                <i class="fas fa-percentage text-blue-500"></i>
+            </div>
+            <p class="text-3xl font-bold {% if perfil.metricas.R2_Score < 0.5 %}text-yellow-700{% else %}text-gray-800{% endif %} mb-2">
+                {{ perfil.metricas.R2_Score|floatformat:4 }}
+            </p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+                {% widthratio perfil.metricas.R2_Score 1 100 as r2_percent %}
+                <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full" style="width: {{ r2_percent }}%"></div>
+            </div>
+            <p class="text-xs text-gray-600">Explica {{ r2_percent }}% de la variabilidad</p>
+        </div>
+        {% endif %}
+
+        <!-- RMSE -->
+        {% if perfil.metricas.RMSE %}
+        <div class="border-2 border-gray-100 rounded-xl p-4 hover:border-red-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="text-sm font-semibold text-gray-600 uppercase">RMSE</h4>
+                <i class="fas fa-exclamation-circle text-red-500"></i>
+            </div>
+            <p class="text-3xl font-bold text-gray-800 mb-2">{{ perfil.metricas.RMSE|floatformat:2 }}</p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+                <div class="bg-gradient-to-r from-red-400 to-red-600 h-2 rounded-full" style="width: 70%"></div>
+            </div>
+            <p class="text-xs text-gray-600">
+                Error típico: ±{{ perfil.metricas.RMSE|floatformat:1 }} puntos
+                {% if perfil.metricas.RMSE < 1.0 %}(Excelente){% elif perfil.metricas.RMSE < 2.0 %}(Bueno){% else %}(Mejorable){% endif %}
+            </p>
+        </div>
+        {% endif %}
+
+        <!-- MAE -->
+        {% if perfil.metricas.MAE %}
+        <div class="border-2 border-gray-100 rounded-xl p-4 hover:border-orange-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="text-sm font-semibold text-gray-600 uppercase">MAE</h4>
+                <i class="fas fa-ruler text-orange-500"></i>
+            </div>
+            <p class="text-3xl font-bold text-gray-800 mb-2">{{ perfil.metricas.MAE|floatformat:2 }}</p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+                <div class="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full" style="width: 65%"></div>
+            </div>
+            <p class="text-xs text-gray-600">
+                Error medio: {{ perfil.metricas.MAE|floatformat:1 }} puntos de diferencia
+            </p>
+        </div>
+        {% endif %}
+
+        <!-- MSE -->
+        {% if perfil.metricas.MSE %}
+        <div class="border-2 border-gray-100 rounded-xl p-4 hover:border-purple-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="text-sm font-semibold text-gray-600 uppercase">MSE</h4>
+                <i class="fas fa-chart-line text-purple-500"></i>
+            </div>
+            <p class="text-3xl font-bold text-gray-800 mb-2">{{ perfil.metricas.MSE|floatformat:2 }}</p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+                <div class="bg-gradient-to-r from-purple-400 to-purple-600 h-2 rounded-full" style="width: 60%"></div>
+            </div>
+            <p class="text-xs text-gray-600">Error cuadrático (penaliza errores grandes)</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Explicación contextual para rendimiento académico -->
+    <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4">
+        <p class="text-sm text-blue-900 mb-3">
+            <i class="fas fa-info-circle mr-2"></i>
+            <strong>Interpretación Integrada para Rendimiento Académico:</strong>
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-3">
+            <div class="bg-white rounded-lg p-3">
+                <p class="text-xs font-semibold text-gray-800 mb-1">Capacidad Explicativa (R²)</p>
+                {% if perfil.metricas.R2_Score %}
+                    {% widthratio perfil.metricas.R2_Score 1 100 as r2_percent_info %}
+                    <p class="text-xs text-gray-700">
+                        El modelo explica <strong>{{ r2_percent_info }}%</strong> de las variaciones en calificaciones.
+                        {% if perfil.metricas.R2_Score >= 0.7 %}
+                            Capacidad <strong class="text-green-600">Alta</strong> para predecir el rendimiento.
+                        {% elif perfil.metricas.R2_Score >= 0.5 %}
+                            Capacidad <strong class="text-blue-600">Moderada</strong>. Hay espacio para mejorar.
+                        {% else %}
+                            Capacidad <strong class="text-yellow-600">Limitada</strong>. Agregar más variables clave.
+                        {% endif %}
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="bg-white rounded-lg p-3">
+                <p class="text-xs font-semibold text-gray-800 mb-1">Precisión de Predicción (RMSE)</p>
+                {% if perfil.metricas.RMSE %}
+                    <p class="text-xs text-gray-700">
+                        Error típico: <strong>±{{ perfil.metricas.RMSE|floatformat:1 }} puntos</strong>.
+                        {% if perfil.metricas.RMSE < 1.0 %}
+                            Predicciones <strong class="text-green-600">muy precisas</strong>.
+                        {% elif perfil.metricas.RMSE < 2.0 %}
+                            Precisión <strong class="text-blue-600">aceptable</strong> para uso práctico.
+                        {% else %}
+                            Precisión <strong class="text-yellow-600">mejorable</strong>. Considerar más datos.
+                        {% endif %}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-3 mt-3">
+            <p class="text-xs font-semibold text-gray-800 mb-2">
+                <i class="fas fa-lightbulb text-blue-500 mr-1"></i>Ejemplo Práctico de Uso:
+            </p>
+            <p class="text-xs text-gray-700">
+                Si un estudiante tiene las características medidas por el modelo, puedes predecir su calificación final con un margen de error de aproximadamente <strong>±{{ perfil.metricas.RMSE|floatformat:1 }} puntos</strong>. Por ejemplo, si el modelo predice 15.0, la calificación real probablemente estará entre {{ 15|add:-0.65|floatformat:1 }} y {{ 15|add:0.65|floatformat:1 }} puntos.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Coeficientes del Modelo (Feature Importance) -->
+{% if perfil.metricas.Feature_Coefficients %}
+<div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+    <h3 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-sliders-h mr-3 text-purple-500"></i>
+        Coeficientes del Modelo - Impacto de Variables
+    </h3>
+
+    <div class="mb-6">
+        <div class="h-80">
+            <canvas id="featureCoefficients"></canvas>
+        </div>
+    </div>
+
+    <!-- Interpretación de coeficientes -->
+    <div class="bg-indigo-50 border-l-4 border-indigo-500 rounded-lg p-4">
+        <h4 class="font-bold text-indigo-800 mb-3 flex items-center">
+            <i class="fas fa-lightbulb mr-2"></i>¿Cómo interpretar los coeficientes?
+        </h4>
+        <div class="space-y-2 text-sm text-indigo-900">
+            <p><strong>Coeficientes positivos (verde):</strong> Incrementan la calificación final cuando aumentan</p>
+            <p><strong>Coeficientes negativos (rojo):</strong> Reducen la calificación final cuando aumentan</p>
+            <p><strong>Magnitud:</strong> Indica qué tan fuerte es el impacto de cada variable</p>
+
+            <div class="bg-white rounded-lg p-3 mt-3">
+                <p class="text-sm font-semibold text-gray-800 mb-2">Ejemplo práctico:</p>
+                <p class="text-xs text-gray-700">
+                    Si un estudiante tiene <strong>PuntajeInicial = 15</strong>, y aumenta su
+                    <strong>AsistenciaClases en 1 punto</strong>, su CalificaciónFinal aumentará en
+                    <strong>+0.16 puntos</strong> (según el coeficiente del modelo).
+                </p>
+                <p class="text-xs text-gray-700 mt-2">
+                    En cambio, si aumenta su <strong>UsoRedesDistractor en 1 punto</strong>,
+                    su CalificaciónFinal <strong>disminuirá -0.28 puntos</strong> (impacto negativo).
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Validación Cruzada - Interpretada -->
+{% if perfil.metricas.CV_Mean_Score %}
+<div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+    <h3 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-chart-line mr-3 text-purple-500"></i>
+        Validación Cruzada (5-Fold) - Consistencia del Modelo
+    </h3>
+
+    <div class="grid md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-purple-50 border-2 border-purple-200 rounded-xl p-6 text-center">
+            <div class="text-4xl font-bold text-purple-600 mb-2">
+                {{ perfil.metricas.CV_Mean_Score|floatformat:4 }}
+            </div>
+            <div class="text-sm text-purple-900 font-semibold">R² Promedio (5 folds)</div>
+            <div class="text-xs text-gray-600 mt-2">Rendimiento consistente del modelo</div>
+        </div>
+
+        <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center">
+            <div class="text-4xl font-bold text-blue-600 mb-2">
+                ± {{ perfil.metricas.CV_Std_Score|floatformat:4 }}
+            </div>
+            <div class="text-sm text-blue-900 font-semibold">Desviación Estándar</div>
+            <div class="text-xs text-gray-600 mt-2">Variabilidad entre folds</div>
+        </div>
+
+        <div class="bg-green-50 border-2 border-green-200 rounded-xl p-6 text-center">
+            <div class="text-4xl font-bold text-green-600 mb-2">
+                {{ perfil.metricas.Best_CV_Score|floatformat:4 }}
+            </div>
+            <div class="text-sm text-green-900 font-semibold">Mejor R² (ajustado)</div>
+            <div class="text-xs text-gray-600 mt-2">Con hiperparámetros óptimos</div>
+        </div>
+    </div>
+
+    <div class="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4">
+        <h4 class="font-bold text-blue-800 mb-3 flex items-center">
+            <i class="fas fa-info-circle mr-2"></i>¿Qué significa la Validación Cruzada?
+        </h4>
+        <div class="space-y-2 text-sm text-blue-900">
+            <p>El dataset se dividió en <strong>5 partes (folds)</strong></p>
+            <p>El modelo se entrenó <strong>5 veces</strong>, cada vez usando 4 partes para entrenar y 1 para validar</p>
+            {% widthratio perfil.metricas.CV_Mean_Score 1 100 as cv_r2_pct %}
+            <p>R² promedio: <strong>{{ cv_r2_pct }}%</strong> - el modelo explica en promedio {{ cv_r2_pct }}% de la varianza</p>
+            <p>Desviación estándar: <strong>{{ perfil.metricas.CV_Std_Score|floatformat:4 }}</strong> - indica {% if perfil.metricas.CV_Std_Score < 0.05 %}muy poca{% elif perfil.metricas.CV_Std_Score < 0.1 %}poca{% else %}algo de{% endif %} variabilidad</p>
+
+            <div class="bg-white rounded-lg p-3 mt-3">
+                <p class="text-xs font-semibold text-gray-800 mb-2">¿Por qué es importante?</p>
+                <p class="text-xs text-gray-700">
+                    La validación cruzada asegura que el modelo no solo memoriza los datos de entrenamiento,
+                    sino que realmente <strong>generaliza bien</strong> a datos nuevos.
+                    {% if perfil.metricas.CV_Std_Score < 0.05 %}
+                        Tu modelo muestra <strong>excelente consistencia</strong> (desviación muy baja).
+                    {% elif perfil.metricas.CV_Std_Score < 0.1 %}
+                        Tu modelo muestra <strong>buena consistencia</strong> entre diferentes conjuntos de datos.
+                    {% else %}
+                        Tu modelo tiene algo de variabilidad. Considera recopilar más datos.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<!-- No Results State -->
+<div class="bg-white rounded-2xl p-12 shadow-lg text-center">
+    <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <i class="fas fa-chart-line text-4xl text-gray-400"></i>
+    </div>
+    <h3 class="text-2xl font-bold text-gray-800 mb-4">No hay resultados disponibles</h3>
+    <p class="text-gray-600 mb-8 max-w-md mx-auto">
+        Para ver métricas y visualizaciones, primero necesitas entrenar tu modelo con un dataset.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        {% if not perfil.dataset_nombre %}
+            <a href="{% url 'dashboard_datos' perfil.id %}" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                <i class="fas fa-upload mr-2"></i>Subir Dataset
+            </a>
+        {% endif %}
+
+        {% if perfil.dataset_nombre and not perfil.algoritmo_elegido %}
+            <a href="{% url 'dashboard_modelo' perfil.id %}" class="bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-colors">
+                <i class="fas fa-robot mr-2"></i>Configurar Modelo
+            </a>
+        {% endif %}
+
+        {% if perfil.dataset_nombre and perfil.algoritmo_elegido %}
+            <a href="{% url 'dashboard_modelo' perfil.id %}" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors">
+                <i class="fas fa-play mr-2"></i>Entrenar Modelo
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Export and Actions -->
+<div class="bg-white rounded-2xl p-6 shadow-lg">
+    <h3 class="text-xl font-bold mb-6 flex items-center">
+        <i class="fas fa-download mr-3 text-indigo-500"></i>
+        Exportar Resultados
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group">
+            <div class="text-center">
+                <i class="fas fa-file-pdf text-2xl text-gray-400 group-hover:text-blue-500 mb-2"></i>
+                <p class="font-medium text-gray-600 group-hover:text-blue-700">Reporte PDF</p>
+            </div>
+        </button>
+
+        <button class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all group">
+            <div class="text-center">
+                <i class="fas fa-file-excel text-2xl text-gray-400 group-hover:text-green-500 mb-2"></i>
+                <p class="font-medium text-gray-600 group-hover:text-green-700">Datos Excel</p>
+            </div>
+        </button>
+
+        <button class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all group">
+            <div class="text-center">
+                <i class="fas fa-code text-2xl text-gray-400 group-hover:text-purple-500 mb-2"></i>
+                <p class="font-medium text-gray-600 group-hover:text-purple-700">Código Python</p>
+            </div>
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if perfil.metricas %}
+    // Feature Coefficients Chart (para Regresión Lineal)
+    const coeffCtx = document.getElementById('featureCoefficients');
+    if (coeffCtx) {
+        {% if perfil.metricas.Feature_Coefficients %}
+        const coeffData = {{ perfil.metricas.Feature_Coefficients|safe }};
+
+        new Chart(coeffCtx, {
+            type: 'bar',
+            data: {
+                labels: coeffData.features,
+                datasets: [{
+                    label: 'Coeficiente',
+                    data: coeffData.coefficients,
+                    backgroundColor: coeffData.coefficients.map(c => c >= 0 ? 'rgba(34, 197, 94, 0.8)' : 'rgba(239, 68, 68, 0.8)'),
+                    borderColor: coeffData.coefficients.map(c => c >= 0 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Coeficientes del Modelo de Regresión Lineal'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Valor del Coeficiente (impacto en calificación)'
+                        }
+                    }
+                }
+            }
+        });
+        {% else %}
+        coeffCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400"><p>No disponible para este modelo</p></div>';
+        {% endif %}
+    }
+    {% endif %}
+
+    // Export functionality
+    document.querySelectorAll('button[class*="group"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const text = this.querySelector('p').textContent;
+            console.log(`Exportando: ${text}`);
+            // Implement export logic here
+        });
+    });
+});
+</script>
+{% endblock %}

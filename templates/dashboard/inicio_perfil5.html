@@ -1,0 +1,405 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block page_title %}Algoritmos de Aprendizaje Supervisado{% endblock %}
+{% block page_subtitle %}Documentación técnica y especificaciones de algoritmos ML{% endblock %}
+
+{% block content %}
+<!-- Project Header -->
+<div class="bg-gradient-to-br from-pink-600 via-rose-700 to-red-800 text-white rounded-2xl p-8 mb-8 relative overflow-hidden">
+    <div class="absolute top-0 right-0 opacity-10">
+        <i class="fas fa-heartbeat text-8xl transform rotate-12"></i>
+    </div>
+    <div class="relative z-10">
+        <h1 class="text-4xl font-bold mb-4">Dashboard de Algoritmos de Clasificación</h1>
+        <p class="text-white/90 text-lg mb-6">
+            Trabajo Parcial de Unidad de Aprendizaje - Aprendizaje Supervisado<br>
+            Estudiante: <strong>{{ perfil.nombre_completo|title }}</strong>
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div class="bg-white/10 rounded-lg p-4">
+                <div class="text-2xl font-bold">6</div>
+                <div class="text-sm opacity-90">Algoritmos Implementados</div>
+            </div>
+            <div class="bg-white/10 rounded-lg p-4">
+                <div class="text-2xl font-bold">Clasificación</div>
+                <div class="text-sm opacity-90">Tipo de Problema</div>
+            </div>
+            <div class="bg-white/10 rounded-lg p-4">
+                <div class="text-2xl font-bold">Python</div>
+                <div class="text-sm opacity-90">Tecnología Base</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Algorithms Cards Grid -->
+<div class="mb-8">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+        <i class="fas fa-cubes mr-3 text-rose-600"></i>
+        Algoritmos de Regresión Implementados
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Regresión Lineal -->
+        <div class="algorithm-card bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-blue-500"
+             onclick="openAlgorithmModal('regresion_lineal')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-chart-line text-blue-600 text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Regresión Lineal</h3>
+            <p class="text-gray-600 text-sm">Algoritmo de aprendizaje supervisado que modela la relación lineal entre variables independientes y la variable dependiente.</p>
+        </div>
+
+        <!-- Regresión Logística - PROYECTO ACTIVO -->
+        <div class="algorithm-card bg-gradient-to-br from-rose-50 to-pink-50 rounded-xl p-6 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-rose-600 relative"
+             onclick="openAlgorithmModal('regresion_logistica')">
+            <!-- Badge del Proyecto -->
+            <div class="absolute top-3 right-3">
+                <span class="bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                    PROYECTO ACTIVO
+                </span>
+            </div>
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-rose-600 rounded-lg flex items-center justify-center shadow-lg">
+                    <i class="fas fa-chart-pie text-white text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-rose-600 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2 flex items-center">
+                Regresión Logística
+                <i class="fas fa-star text-yellow-500 ml-2 text-sm"></i>
+            </h3>
+            <p class="text-gray-700 text-sm font-medium mb-3">Algoritmo de clasificación que utiliza la función logística para modelar probabilidades de pertenencia a clases.</p>
+
+            <!-- Info del Proyecto -->
+            <div class="bg-white/70 rounded-lg p-3 border border-rose-200 mt-3">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-project-diagram text-rose-600 mr-2"></i>
+                    <span class="text-xs font-bold text-rose-800">PROYECTO PARCIAL</span>
+                </div>
+                <p class="text-xs text-gray-700 leading-relaxed">
+                    <strong>Clasificación de Anemia en Gestantes - Puno 2025</strong><br>
+                    Dataset: Gestantes primer semestre | 4 clases<br>
+                    Variables: Edad, edad gestacional, hemoglobina, provincia
+                </p>
+            </div>
+        </div>
+
+        <!-- Ridge y Lasso -->
+        <div class="algorithm-card bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-purple-500"
+             onclick="openAlgorithmModal('ridge_lasso')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-balance-scale text-purple-600 text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Ridge y Lasso</h3>
+            <p class="text-gray-600 text-sm">Técnicas de regularización que extienden la regresión lineal para prevenir el sobreajuste mediante penalizaciones.</p>
+        </div>
+
+        <!-- Árbol de Regresión CART -->
+        <div class="algorithm-card bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-yellow-500"
+             onclick="openAlgorithmModal('arbol_cart')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-sitemap text-yellow-600 text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Árbol de Regresión CART</h3>
+            <p class="text-gray-600 text-sm">Algoritmo de árbol de decisión que realiza divisiones binarias recursivas para problemas de regresión.</p>
+        </div>
+
+        <!-- K-Nearest Neighbors -->
+        <div class="algorithm-card bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-red-500"
+             onclick="openAlgorithmModal('knn')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-users text-red-600 text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">K-Nearest Neighbors</h3>
+            <p class="text-gray-600 text-sm">Algoritmo de aprendizaje perezoso que predice basándose en los k vecinos más cercanos en el espacio de características.</p>
+        </div>
+
+        <!-- Red Neuronal para Regresión -->
+        <div class="algorithm-card bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer border-l-4 border-indigo-500"
+             onclick="openAlgorithmModal('red_neuronal')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-brain text-indigo-600 text-xl"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Red Neuronal para Regresión</h3>
+            <p class="text-gray-600 text-sm">Red neuronal artificial multicapa que puede modelar relaciones complejas no lineales entre variables.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Algorithm Theory Modal -->
+<div id="algorithmModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-2xl max-w-4xl max-h-[90vh] overflow-y-auto mx-4 w-full">
+        <div id="modalContent">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Algorithm modal functionality
+    window.openAlgorithmModal = function(algorithmType) {
+        const modal = document.getElementById('algorithmModal');
+        const modalContent = document.getElementById('modalContent');
+
+        const algorithms = {
+            'regresion_logistica': {
+                title: 'Regresión Logística',
+                icon: 'fas fa-percentage',
+                color: 'rose',
+                description: 'Clasificación multiclase',
+                content: `
+                    <div class="p-8">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-rose-600 rounded-lg flex items-center justify-center mr-4 shadow-lg">
+                                <i class="fas fa-chart-pie text-white text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center">
+                                    <h2 class="text-3xl font-bold text-gray-800">Regresión Logística</h2>
+                                    <span class="ml-3 bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                                        PROYECTO ACTIVO
+                                    </span>
+                                </div>
+                                <p class="text-gray-600">Clasificación multiclase (4 categorías)</p>
+                            </div>
+                            <button onclick="closeAlgorithmModal()" class="ml-auto text-gray-400 hover:text-gray-600 text-2xl">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <!-- PROYECTO PARCIAL - Info destacada -->
+                        <div class="bg-gradient-to-r from-rose-50 to-pink-50 rounded-xl p-6 mb-6 border-l-4 border-rose-600 shadow-md">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-project-diagram text-rose-600 text-2xl mr-3"></i>
+                                <h3 class="text-xl font-bold text-rose-800">PROYECTO PARCIAL - Aprendizaje Supervisado</h3>
+                            </div>
+                            <h4 class="text-lg font-bold text-gray-800 mb-3">Clasificación de Anemia en Gestantes - Departamento Puno (Primer Semestre 2025)</h4>
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-700 mb-2">
+                                    <strong>Problemática:</strong> La anemia en gestantes es un problema de salud pública en Puno, afectando el desarrollo fetal y la salud materna. Este proyecto clasifica el nivel de anemia (Normal, Leve, Moderada, Severa) basándose en características médicas y demográficas de la gestante.
+                                </p>
+                            </div>
+                            <div class="text-sm text-gray-700 space-y-1">
+                                <p><strong>Problema:</strong> Clasificación multiclase (4 categorías de Dx_Anemia)</p>
+                                <p><strong>Variable objetivo:</strong> Dx_Anemia</p>
+                                <ul class="list-disc list-inside ml-4 mt-1 text-xs space-y-0.5">
+                                    <li>Normal (hemoglobina ≥ 11 g/dL)</li>
+                                    <li>Anemia Leve (10-10.9 g/dL)</li>
+                                    <li>Anemia Moderada (7-9.9 g/dL)</li>
+                                    <li>Anemia Severa (< 7 g/dL)</li>
+                                </ul>
+                                <p class="mt-2"><strong>Variables predictoras:</strong></p>
+                                <ul class="list-disc list-inside ml-4 mt-1 text-xs space-y-0.5">
+                                    <li><strong>Edad:</strong> Edad de la gestante (años)</li>
+                                    <li><strong>Edad_Gest:</strong> Semanas de gestación</li>
+                                    <li><strong>Provincia:</strong> Provincia de residencia en Puno</li>
+                                    <li><strong>Hemoglobina:</strong> Nivel de hemoglobina (g/dL)</li>
+                                </ul>
+                                <p class="mt-2"><strong>Técnicas:</strong> Validación cruzada (5-fold) + GridSearchCV para hiperparámetros + One-vs-Rest para multiclase</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- JUSTIFICACIÓN PARA EL PROYECTO -->
+                            <div class="bg-green-50 rounded-lg p-5 border border-green-200">
+                                <h3 class="text-xl font-bold text-green-800 mb-4 flex items-center">
+                                    <i class="fas fa-lightbulb mr-2"></i>¿Por qué Regresión Logística para este Proyecto?
+                                </h3>
+                                <div class="space-y-3 text-sm text-gray-700">
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
+                                        <div>
+                                            <strong>Interpretabilidad clínica:</strong> Los coeficientes permiten identificar qué factores (edad, semanas de gestación, provincia) incrementan el riesgo de anemia, crucial para intervenciones de salud pública.
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
+                                        <div>
+                                            <strong>Probabilidades calibradas:</strong> Calcula P(Anemia Severa | características) para priorizar atención médica urgente.
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
+                                        <div>
+                                            <strong>Clasificación multiclase:</strong> Usa estrategia One-vs-Rest (OvR) para distinguir entre 4 niveles de anemia.
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
+                                        <div>
+                                            <strong>Eficiencia:</strong> Rápido entrenamiento. Ideal para centros de salud con recursos limitados.
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
+                                        <div>
+                                            <strong>Validación científica:</strong> Ampliamente usado en epidemiología y salud pública (OMS, MINSA).
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-info-circle mr-2 text-rose-600"></i>Definición
+                                </h3>
+                                <p class="text-gray-700 leading-relaxed">
+                                    La regresión logística es un algoritmo de clasificación que utiliza la función logística (sigmoide) para modelar la probabilidad de que una instancia pertenezca a una clase particular. Para clasificación multiclase, se usa la estrategia One-vs-Rest (OvR), entrenando un clasificador binario por cada clase.
+                                </p>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-cogs mr-2 text-rose-600"></i>Funcionamiento
+                                </h3>
+                                <p class="text-gray-700 mb-3">Utiliza la función sigmoide para mapear valores reales a probabilidades entre 0 y 1:</p>
+                                <div class="bg-gray-100 p-4 rounded-lg font-mono text-sm">
+                                    p(y=1|x) = 1 / (1 + e^(-(β₀ + β₁x₁ + β₂x₂ + ... + βₙxₙ)))
+                                </div>
+                                <p class="text-gray-700 mt-3">Para multiclase (4 categorías), se entrena un modelo por clase vs resto.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-lg font-bold text-green-800 mb-3">Ventajas</h3>
+                                    <ul class="list-disc list-inside text-green-700 space-y-1 text-sm">
+                                        <li>Proporciona probabilidades de clase</li>
+                                        <li>Interpretación médica de coeficientes</li>
+                                        <li>Maneja clasificación multiclase</li>
+                                        <li>Eficiente computacionalmente</li>
+                                        <li>No asume distribución normal</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-red-800 mb-3">Limitaciones</h3>
+                                    <ul class="list-disc list-inside text-red-700 space-y-1 text-sm">
+                                        <li>Asume relación lineal entre predictores y log-odds</li>
+                                        <li>Sensible a características irrelevantes</li>
+                                        <li>Requiere muestras grandes para multiclase</li>
+                                        <li>Multicolinealidad afecta interpretación</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- RESULTADOS ESPERADOS -->
+                            <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-5 border-l-4 border-purple-600">
+                                <h3 class="text-xl font-bold text-purple-800 mb-4 flex items-center">
+                                    <i class="fas fa-chart-bar mr-2"></i>Resultados Esperados del Proyecto
+                                </h3>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                                    <div class="bg-white rounded-lg p-3 text-center shadow-sm">
+                                        <div class="text-2xl font-bold text-purple-600">&gt;80%</div>
+                                        <div class="text-xs text-gray-600">Accuracy</div>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-3 text-center shadow-sm">
+                                        <div class="text-2xl font-bold text-purple-600">&gt;0.75</div>
+                                        <div class="text-xs text-gray-600">F1-Score macro</div>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-3 text-center shadow-sm">
+                                        <div class="text-2xl font-bold text-purple-600">&gt;0.85</div>
+                                        <div class="text-xs text-gray-600">ROC-AUC (OvR)</div>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-3 text-center shadow-sm">
+                                        <div class="text-2xl font-bold text-purple-600">&gt;0.75</div>
+                                        <div class="text-xs text-gray-600">CV Score</div>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-700 mb-2">
+                                    <strong>Interpretación de coeficientes esperada:</strong>
+                                </p>
+                                <ul class="text-xs text-gray-700 space-y-1">
+                                    <li>• <strong>Hemoglobina:</strong> Mayor impacto (coef. negativo alto → más hemoglobina = menos anemia)</li>
+                                    <li>• <strong>Edad gestacional:</strong> Impacto positivo (más avanzado embarazo → más riesgo)</li>
+                                    <li>• <strong>Edad:</strong> Impacto moderado (extremos de edad → más riesgo)</li>
+                                    <li>• <strong>Provincia:</strong> Variación geográfica (zonas rurales → más riesgo)</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-code mr-2 text-rose-600"></i>Implementación en el Proyecto
+                                </h3>
+                                <div class="bg-gray-900 text-gray-100 p-4 rounded-lg">
+                                    <pre class="text-sm"><code>from apps.ml_models import MLPipeline
+
+# Crear pipeline con POO
+pipeline = MLPipeline(
+    algorithm='regresion_logistica',
+    problem_type='classification'
+)
+
+# Ejecutar pipeline completo
+results = pipeline.run_complete_pipeline(
+    file_path='dataset_anemia_gestantes_puno.csv',
+    test_size=0.2,
+    use_cross_validation=True,      # 5-fold CV
+    hyperparameter_tuning=True,      # GridSearchCV
+    engineer_features=False
+)
+
+# Ver métricas
+print(f"Accuracy: {results['evaluation']['Accuracy']:.4f}")
+print(f"F1-Score: {results['evaluation']['F1_Score']:.4f}")
+print(f"ROC-AUC: {results['evaluation']['ROC_AUC']:.4f}")</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            // Los demás algoritmos se pueden manejar con mensajes simples
+            'regresion_lineal': {
+                title: 'Regresión Lineal',
+                content: '<div class="p-8"><p>Ver contenido completo en el proyecto principal</p></div>'
+            }
+        };
+
+        const algorithm = algorithms[algorithmType];
+        if (algorithm && algorithm.content) {
+            modalContent.innerHTML = algorithm.content;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+    };
+
+    window.closeAlgorithmModal = function() {
+        const modal = document.getElementById('algorithmModal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    };
+
+    // Close modal when clicking outside
+    document.getElementById('algorithmModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAlgorithmModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeAlgorithmModal();
+        }
+    });
+});
+</script>
+{% endblock %}

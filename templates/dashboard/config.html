@@ -1,33 +1,35 @@
 {% extends 'dashboard/base_dashboard.html' %}
 
 {% block page_title %}Configuración{% endblock %}
-{% block page_subtitle %}Ajustes del proyecto y preferencias del usuario{% endblock %}
+{% block page_subtitle %}Información del proyecto y configuración del perfil{% endblock %}
 
 {% block content %}
 <!-- Profile Settings -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
     <!-- Profile Card -->
-    <div class="lg:col-span-2 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl p-8 relative overflow-hidden">
+    <div class="lg:col-span-2 bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-2xl p-8 relative overflow-hidden">
         <div class="absolute top-0 right-0 opacity-20">
-            <i class="fas fa-user-cog text-8xl transform rotate-12"></i>
+            <i class="fas fa-user-graduate text-8xl transform rotate-12"></i>
         </div>
         <div class="relative z-10">
-            <h2 class="text-3xl font-bold mb-4">Configuración del Perfil</h2>
+            <h2 class="text-3xl font-bold mb-4">Perfil del Estudiante</h2>
             <p class="text-white/90 text-lg mb-6">
-                Personaliza tu experiencia y configura las preferencias de tu proyecto de Machine Learning.
+                Proyecto Parcial - Aprendizaje Supervisado<br>
+                <strong>Predicción de Pobreza Monetaria en Puno</strong>
             </p>
             <div class="flex items-center space-x-4">
                 {% if perfil.avatar %}
                     <img src="{{ perfil.avatar.url }}" alt="{{ perfil.nombre_completo }}"
-                         class="w-16 h-16 rounded-full border-3 border-white/30 object-cover">
+                         class="w-20 h-20 rounded-full border-4 border-white/30 object-cover">
                 {% else %}
-                    <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">
+                    <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold">
                         {{ perfil.nombre_completo|first|upper }}
                     </div>
                 {% endif %}
                 <div>
-                    <h3 class="text-xl font-semibold">{{ perfil.nombre_completo|title }}</h3>
-                    <p class="text-white/80">Miembro desde {{ perfil.fecha_registro|date:"F Y" }}</p>
+                    <h3 class="text-2xl font-semibold">{{ perfil.nombre_completo }}</h3>
+                    <p class="text-white/90 text-sm">{{ perfil.carrera }}</p>
+                    <p class="text-white/80 text-sm">Miembro desde {{ perfil.fecha_registro|date:"d/m/Y" }}</p>
                 </div>
             </div>
         </div>
@@ -38,11 +40,17 @@
         <div class="bg-white rounded-xl p-6 shadow-lg">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-600 text-sm">Proyectos Activos</p>
-                    <p class="text-2xl font-bold text-gray-800">1</p>
+                    <p class="text-gray-600 text-sm">Dataset Cargado</p>
+                    <p class="text-lg font-bold text-gray-800">
+                        {% if perfil.dataset_nombre %}
+                            <i class="fas fa-check-circle text-green-500"></i> Sí
+                        {% else %}
+                            <i class="fas fa-times-circle text-red-500"></i> No
+                        {% endif %}
+                    </p>
                 </div>
                 <div class="w-16 h-16 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center">
-                    <i class="fas fa-project-diagram text-white text-xl"></i>
+                    <i class="fas fa-database text-white text-xl"></i>
                 </div>
             </div>
         </div>
@@ -50,13 +58,85 @@
         <div class="bg-white rounded-xl p-6 shadow-lg">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-600 text-sm">Modelos Entrenados</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ perfil.modelos_entrenados|default:0 }}</p>
+                    <p class="text-gray-600 text-sm">Modelo Entrenado</p>
+                    <p class="text-lg font-bold text-gray-800">
+                        {% if perfil.tiene_modelo_entrenado %}
+                            <i class="fas fa-check-circle text-green-500"></i> Sí
+                        {% else %}
+                            <i class="fas fa-times-circle text-orange-500"></i> No
+                        {% endif %}
+                    </p>
                 </div>
                 <div class="w-16 h-16 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center">
                     <i class="fas fa-robot text-white text-xl"></i>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estado del Proyecto Puno -->
+<div class="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-600 rounded-xl p-6 mb-8 shadow-lg">
+    <h3 class="text-xl font-bold text-green-800 mb-4 flex items-center">
+        <i class="fas fa-project-diagram mr-3"></i>
+        Estado del Proyecto: Predicción de Pobreza en Puno
+    </h3>
+
+    <div class="grid md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-blue-600">
+                {% if perfil.algoritmo_elegido %}
+                    <i class="fas fa-check-circle text-green-500"></i>
+                {% else %}
+                    <i class="fas fa-circle text-gray-300"></i>
+                {% endif %}
+            </div>
+            <p class="text-sm text-gray-700 mt-2">Algoritmo Seleccionado</p>
+            {% if perfil.algoritmo_elegido %}
+            <p class="text-xs text-green-600 font-medium mt-1">{{ perfil.get_algoritmo_elegido_display }}</p>
+            {% endif %}
+        </div>
+
+        <div class="bg-white rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold">
+                {% if perfil.dataset_nombre %}
+                    <i class="fas fa-check-circle text-green-500"></i>
+                {% else %}
+                    <i class="fas fa-circle text-gray-300"></i>
+                {% endif %}
+            </div>
+            <p class="text-sm text-gray-700 mt-2">Dataset Cargado</p>
+            {% if perfil.dataset_nombre %}
+            <p class="text-xs text-green-600 font-medium mt-1 truncate">{{ perfil.dataset_nombre }}</p>
+            {% endif %}
+        </div>
+
+        <div class="bg-white rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold">
+                {% if perfil.tiene_modelo_entrenado %}
+                    <i class="fas fa-check-circle text-green-500"></i>
+                {% else %}
+                    <i class="fas fa-circle text-gray-300"></i>
+                {% endif %}
+            </div>
+            <p class="text-sm text-gray-700 mt-2">Modelo Entrenado</p>
+            {% if perfil.metricas.Accuracy %}
+            <p class="text-xs text-green-600 font-medium mt-1">Accuracy: {{ perfil.metricas.Accuracy|floatformat:2 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="bg-white rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold">
+                {% if perfil.metricas %}
+                    <i class="fas fa-check-circle text-green-500"></i>
+                {% else %}
+                    <i class="fas fa-circle text-gray-300"></i>
+                {% endif %}
+            </div>
+            <p class="text-sm text-gray-700 mt-2">Resultados Disponibles</p>
+            {% if perfil.metricas %}
+            <a href="{% url 'dashboard_resultados' perfil.id %}" class="text-xs text-blue-600 hover:underline font-medium mt-1 inline-block">Ver Resultados</a>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -332,9 +412,14 @@
         <button class="bg-red-100 text-red-700 py-3 px-4 rounded-lg hover:bg-red-200 transition-colors border border-red-300">
             <i class="fas fa-chart-line mr-2"></i>Borrar Resultados
         </button>
-        <button class="bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors">
-            <i class="fas fa-user-times mr-2"></i>Eliminar Proyecto
-        </button>
+
+        <!-- Formulario para eliminar perfil -->
+        <form method="POST" action="{% url 'eliminar_perfil' perfil.id %}" id="eliminarPerfilForm" class="m-0">
+            {% csrf_token %}
+            <button type="button" onclick="confirmarEliminacion()" class="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors">
+                <i class="fas fa-user-times mr-2"></i>Eliminar Perfil Completo
+            </button>
+        </form>
     </div>
 </div>
 {% endblock %}
@@ -370,8 +455,8 @@ document.addEventListener('DOMContentLoaded', function() {
         updateMemoryValue();
     }
 
-    // Danger zone actions
-    document.querySelectorAll('.bg-red-100, .bg-red-600').forEach(button => {
+    // Danger zone actions (solo para botones que no son eliminar perfil)
+    document.querySelectorAll('.bg-red-100').forEach(button => {
         button.addEventListener('click', function() {
             const action = this.textContent.trim();
             if (confirm(`¿Estás seguro que deseas ${action.toLowerCase()}? Esta acción no se puede deshacer.`)) {
@@ -433,5 +518,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Función para confirmar eliminación del perfil
+function confirmarEliminacion() {
+    const confirmacion = confirm(
+        '⚠️ ADVERTENCIA ⚠️\n\n' +
+        '¿Estás COMPLETAMENTE SEGURO de que deseas ELIMINAR este perfil?\n\n' +
+        'Esta acción eliminará:\n' +
+        '• Tu perfil completo\n' +
+        '• El dataset cargado\n' +
+        '• El modelo entrenado\n' +
+        '• Todas las métricas y resultados\n\n' +
+        'Esta acción NO SE PUEDE DESHACER.'
+    );
+
+    if (confirmacion) {
+        const confirmacionFinal = confirm(
+            '¿Estás ABSOLUTAMENTE SEGURO?\n\n' +
+            'Escribe OK mentalmente y presiona Aceptar para continuar.'
+        );
+
+        if (confirmacionFinal) {
+            document.getElementById('eliminarPerfilForm').submit();
+        }
+    }
+}
 </script>
 {% endblock %}
